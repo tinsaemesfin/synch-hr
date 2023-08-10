@@ -2,7 +2,7 @@
 import Image from "next/image";
 import React, { useState } from "react";
 import * as z from "zod";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
@@ -15,6 +15,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
+import { redirect } from "next/dist/server/api-utils";
+import { toast } from "react-hot-toast";
+import { NextResponse } from "next/server";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   username: z.string().min(4),
@@ -24,6 +28,7 @@ type LoginForm = z.infer<typeof formSchema>;
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
   const form = useForm<LoginForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -34,29 +39,25 @@ const Login = () => {
   const onSubmitLogin = async (data: LoginForm) => {
     console.log(data);
     setLoading(true);
-    try {
-     await signIn('credentials',data)
-      // const res = await fetch("/api/auth/callback/credentials", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     username: data.username,
-      //     password: data.password,
+    let signInData;
+   
+    await signIn('credentials',{...data,redirect:false}).then((callback)=>{
+        setLoading(false);
+        console.log(callback)
         
-      //   }),
-      // });
-
+        if(callback?.error){
+          toast.error('Sign in failed');
+        }
+        else{
+          toast.success('Sign in Success');
+          router.refresh();
+        }
+      })
+      
+      
      
-      // const json = await res.json();
-      // if (!res.ok) throw Error(json.message);
-      // console.log(res)
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      console.log(error);
-    }
+      
+   
   };
 
   return (
@@ -109,14 +110,14 @@ const Login = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="block text-sm font-medium text-gray-700">
-                        Username
+                        Password
                       </FormLabel>
                       <FormControl className="mt-1">
                         <Input
                           className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                           type="password"
                           disabled={loading}
-                          placeholder="Username"
+                          placeholder="Password"
                           {...field}
                         />
                       </FormControl>

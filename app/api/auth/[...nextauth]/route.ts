@@ -17,31 +17,25 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials || !credentials.username || !credentials.password) {
-          return null;
+          throw new Error("Invalid credentials");
         }
-        try {
-          const { username, password } = credentials;
+        const { username, password } = credentials;
 
-          await connectToDatabase();
-          const user = await prismadb.user.findFirst({
-            where: {
-              username,
-            },
-          });
-          if (!user) {
-            return null;
-          }
-          const match = await bcrypt.compare(password, user.hashedPassword);
-          if (!match) {
-            return null;
-          }
-          return user;
-        } catch (e) {
-          console.log(e);
-          return null;
-        } finally {
-          await prismadb.$disconnect();
+        await connectToDatabase();
+        const user = await prismadb.user.findFirst({
+          where: {
+            username,
+          },
+        });
+        if (!user) {
+          throw new Error("Invalid credentials");
         }
+        const match = await bcrypt.compare(password, user.hashedPassword);
+        if (!match) {
+          throw new Error("Invalid credentials");
+        }
+        await prismadb.$disconnect();
+        return user;
       },
     }),
   ],
@@ -67,14 +61,13 @@ export const authOptions: NextAuthOptions = {
       }
 
       if (authUser) {
-        return  {
+        return {
           id: authUser.id,
           name: authUser.name,
           username: authUser.username,
           role: authUser.role,
           email: authUser.email,
           tenantId: authUser.tenantId,
-          
         };
       }
 
@@ -88,13 +81,12 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id;
         session.user.role = token.role;
         session.user.tenantId = token.tenantId;
-        
       }
       return session;
     },
   },
-  pages:{
-    signIn: '/signin',
+  pages: {
+    signIn: "/signin",
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

@@ -13,12 +13,37 @@ export default async function middleware(req: NextRequest) {
       req,
       secret: process.env.NEXTAUTH_SECRET,
     });
+    
+
   
-    if (!session && path === "/") {
+     if (!session && (path === "/" || path.startsWith("/admin") || path.startsWith("/t"))) {
       return NextResponse.redirect(new URL("/signin", req.url));
-    } else if (session && (path === "/signin" || path === "/sign-p")) {
+    }
+    // else if(session && session.role === "superAdmin" && session.tenantId ==='64d2210a1be452ef56c8eb6c' && !path.startsWith('/admin')){
+    //   return NextResponse.redirect(new URL("/admin", req.url));
+    // }
+    
+    
+    else if (session && (path === "/signin" || path === "/signup")) {
+      console.log(session)
       return NextResponse.redirect(new URL("/", req.url));
     }
+    else if(session && session.role === "superAdmin" && session.tenantId ==='64d2210a1be452ef56c8eb6c' && !path.startsWith('/admin')){
+      console.log(JSON.stringify(session),path)
+      return NextResponse.redirect(new URL("/admin", req.nextUrl));
+    }
+
     return NextResponse.next();
+  }
+
+  export const config ={
+    matcher:[
+      '/',
+      '/signin',
+      '/signup',
+      '/admin',
+      '/api',
+
+    ]
   }
   

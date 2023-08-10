@@ -24,3 +24,5 @@ export const POST = async (req: Request) => {
     await prismadb.$disconnect();
   }
 };
+
+
