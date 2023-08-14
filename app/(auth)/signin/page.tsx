@@ -38,19 +38,18 @@ const Login = () => {
   });
   const onSubmitLogin = async (data: LoginForm) => {
     console.log(data);
-    setLoading(true);
-    let signInData;
-   
+    setLoading(true);   
     await signIn('credentials',{...data,redirect:false}).then((callback)=>{
         setLoading(false);
         console.log(callback)
         
         if(callback?.error){
-          toast.error('Sign in failed');
+          toast.error(callback.error);
         }
         else{
           toast.success('Sign in Success');
           router.refresh();
+          router.push('/');
         }
       })
       

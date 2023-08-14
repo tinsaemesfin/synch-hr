@@ -1,31 +1,37 @@
-import prismadb from "@/Prisma";
-import { connectToDatabase } from "@/libs/server-helpers";
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
+import dbConnect from "@/mongoDB/dbConnect";
+import User from "@/mongoDB/USER";
+// import { ObjectId } from "bson";
+import mongoose, { isValidObjectId } from "mongoose";
+import {ObjectId as objectId} from "mongodb";
+import Tenant from "@/mongoDB/TENANT";
 
 export const POST = async (req: Request) => {
+  console.log("post register");
   try {
     const { name, email, password, username } = await req.json();
     if (!name || !email || !password || !username) {
       return NextResponse.json({ message: "invalid Data" }, { status: 422 });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    await connectToDatabase();
-    const newUser = await prismadb.user.create({
-      data: {
-        email,
-        name,
-        hashedPassword,
-        username,
-        role: "superAdmin",
-        tenantId: '64d2210a1be452ef56c8eb6c',
-      },
+    await dbConnect();
+    const newUser = new Tenant({       
+      name:'superAdmin',
+      description:'this tenant is only for super admin',
     });
-    return NextResponse.json({ newUser },{status:201});
+  
+    const savedUser = await newUser.save();
+    const iddd='64d2027de0848782ba145df6'
+     const t = isValidObjectId(iddd)
+    const user = await Tenant.find();
+    return NextResponse.json({user }, { status: 201 });
   } catch (e) {
     console.log(e);
-    return NextResponse.json({ message: "Something went wrong" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 }
+    );
   } finally {
-    await prismadb.$disconnect();
   }
 };

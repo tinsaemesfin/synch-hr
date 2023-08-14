@@ -1,39 +1,41 @@
-
 "use client";
-import Image from 'next/image';
-import React, {  useState } from 'react';
-import { CircleDashedIcon, LayoutDashboard, MessageSquare } from 'lucide-react';
+import Image from "next/image";
+import React, { useState } from "react";
+import {
+  CircleDashedIcon,
+  LayoutDashboard,
+  LogOutIcon,
+  MessageSquare,
+} from "lucide-react";
 import { usePathname } from "next/navigation";
-import Link from 'next/link';
-import { cn } from '@/libs/utils';
-import { Montserrat } from 'next/font/google';
+import Link from "next/link";
+import { cn } from "@/libs/utils";
+import { Montserrat } from "next/font/google";
+import { signOut } from "next-auth/react";
 
 const routes = [
   {
-    label: 'Dashboard',
+    label: "Dashboard",
     // icon: CircleDashedIcon,
-    href: '/admin',
-    color: "text-sky-500"
+    href: "/admin",
+    color: "text-sky-500",
   },
   {
-    label: 'Conversation',
+    label: "Conversation",
     // icon: MessageSquare,
-    href: '/conversation',
+    href: "/conversation",
     color: "text-violet-500",
   },
-  
 ];
-const poppins = Montserrat ({ weight: '600', subsets: ['latin'] });
-
+const poppins = Montserrat({ weight: "600", subsets: ["latin"] });
 
 export const SideBar = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const pathname = usePathname();
   return (
     <div className="space-y-4 py-4 flex flex-col h-full bg-[#153988] text-white">
       <div className="px-3 py-2 flex-1">
         <Link href="/" className="flex items-center pl-3 mb-14">
-          
           <h1 className={cn("text-2xl font-bold", poppins.className)}>
             Sync-HR
           </h1>
@@ -41,11 +43,13 @@ export const SideBar = () => {
         <div className="space-y-1">
           {routes.map((route) => (
             <Link
-              key={route.href} 
+              key={route.href}
               href={route.href}
               className={cn(
                 "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-white hover:bg-white/10 rounded-lg transition",
-                pathname === route.href ? "text-white bg-white/10" : "text-zinc-400",
+                pathname === route.href
+                  ? "text-white bg-white/10"
+                  : "text-zinc-400"
               )}
             >
               <div className="flex items-center flex-1">
@@ -54,9 +58,17 @@ export const SideBar = () => {
               </div>
             </Link>
           ))}
+          <div className="mt-auto">
+            <button
+              className="flex items-center px-3 py-2 rounded-md hover:bg-[#1e4c8c] transition-colors duration-200"
+              onClick={()=>{signOut()}}
+            >
+              <LogOutIcon className="h-5 w-5 mr-2" />
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
       </div>
-     
     </div>
   );
-}
+};

@@ -1,23 +1,23 @@
 // import { Separator } from "@radix-ui/react-separator";
 
-import prismadb from "@/Prisma";
+// import prismadb from "@/Prisma";
 import {format} from "date-fns";
 import AdminClient from "./components/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
+import { ObjectId } from "bson";
+import Tenant from "@/mongoDB/TENANT";
 
 export default async function AdminHome() {
   const session = await getServerSession(authOptions);
   if(!session){
     return null;
   }
-  const tenants = await prismadb.tenant.findMany({
-    where:{
-      NOT:{
-        id:session.user.tenantId
-      }
-    }
-  });
+
+  const tenants = await Tenant.find({
+   
+        _id:{$ne: session.user.tenantId}
+      });
   const formattedTenants = tenants.map((tenant) => ({
     id: tenant.id,
     name: tenant.name,    

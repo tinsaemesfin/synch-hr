@@ -1,13 +1,19 @@
+   
 import bcrypt from "bcrypt";
 import NextAuth from "next-auth/next";
-import { NextAuthOptions } from "next-auth";
+import { NextAuthOptions, RequestInternal,  User as UserType } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { connectToDatabase } from "@/libs/server-helpers";
-import prismadb from "@/Prisma";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
+
+// import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
+import clientPromise from "@/mongoDB/mongodb";
+import User from "@/mongoDB/USER" ;
+import dbConnect from "@/mongoDB/dbConnect";
+import Tenant from "@/mongoDB/TENANT";
+import { JWT } from "next-auth/jwt";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prismadb),
+  adapter: MongoDBAdapter(clientPromise) ,
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -15,26 +21,25 @@ export const authOptions: NextAuthOptions = {
         username: { label: "Username", type: "text", placeholder: "Username" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials){
         if (!credentials || !credentials.username || !credentials.password) {
-          throw new Error("Invalid credentials");
+          throw new Error("Invalid credentials credentials");
         }
         const { username, password } = credentials;
 
-        await connectToDatabase();
-        const user = await prismadb.user.findFirst({
-          where: {
-            username,
-          },
-        });
+        await dbConnect();
+        const user = await User.findOne({
+          username,
+        }); // Use the lean() method to return a plain JavaScript object
+
         if (!user) {
-          throw new Error("Invalid credentials");
+          throw new Error("Invalid credentials user + ");
         }
         const match = await bcrypt.compare(password, user.hashedPassword);
         if (!match) {
-          throw new Error("Invalid credentials");
-        }
-        await prismadb.$disconnect();
+          throw new Error("Invalid credentials match");
+        }   
+        // console.log(user)     
         return user;
       },
     }),
@@ -46,39 +51,31 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, user, account, profile, isNewUser }) {
-      await connectToDatabase();
-      let authUser = null;
-      try {
-        authUser = await prismadb.user.findFirst({
-          where: {
-            username: token.username,
-          },
-        });
-      } catch (e) {
-        console.log(e);
-      } finally {
-        await prismadb.$disconnect();
+      if(user)
+      {
+        return{
+          ...token,
+          _id: user._id,
+          name: user.name,
+          username: user.username,
+          role: user.role,
+          email: user.email,
+          tenantId: user.tenantId,
+          
+        }
       }
-
-      if (authUser) {
-        return {
-          id: authUser.id,
-          name: authUser.name,
-          username: authUser.username,
-          role: authUser.role,
-          email: authUser.email,
-          tenantId: authUser.tenantId,
-        };
-      }
+     
 
       return token;
     },
     async session({ token, session, user }) {
+     
       if (token) {
+        // console.log(token)
         session.user.email = token.email;
         session.user.name = token.name;
         session.user.username = token.username;
-        session.user.id = token.id;
+        session.user._id = token._id;
         session.user.role = token.role;
         session.user.tenantId = token.tenantId;
       }

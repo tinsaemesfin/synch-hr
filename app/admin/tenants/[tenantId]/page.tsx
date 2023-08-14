@@ -1,19 +1,27 @@
 
-import prismadb from "@/Prisma";
 import React from "react";
 import { ObjectId } from "bson";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import dbConnect from "@/mongoDB/dbConnect";
+import Tenant from "@/mongoDB/TENANT";
+import { isValidObjectId } from "mongoose";
+import { notFound } from "next/navigation";
 
 
 
 const TenantForm = async ({ params }: { params: { tenantId: string } }) => {
   let data=null;
-  const tenant = await prismadb.tenant.findUnique({
+  if(!isValidObjectId(params.tenantId)) {
+  notFound();
+  }
+  await dbConnect();
+  const tenant = await Tenant.findById({
     where: {
       id: params.tenantId ,
     },
   });
+  console.log(tenant)
   // if(tenant) {
 
 
@@ -52,7 +60,7 @@ const TenantForm = async ({ params }: { params: { tenantId: string } }) => {
 
   return (
     <div className="flex-col">
-      <div className="flex-1 space-y-4 p-8 pt-6"></div>
+      <div className="flex-1 space-y-4 p-8 pt-6"> file</div>
     </div>
   );
 };
