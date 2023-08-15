@@ -9,8 +9,8 @@ export default async function middleware(req: NextRequest) {
 
   const session = await getToken({
     req,
-    secret: process.env.NEXTAUTH_SECRET,
   });
+  const requestHeaders = new Headers(req.headers);
 
   if (
     !session &&
@@ -30,11 +30,19 @@ export default async function middleware(req: NextRequest) {
     !path.startsWith("/admin")
   ) {
     return NextResponse.redirect(new URL("/admin", req.nextUrl));
+  } else if (path.startsWith("/api/employee") && session) {
+    const tenantId = session ?? requestHeaders.get("token");
+    requestHeaders.set("token", String(tenantId));
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/signin", "/signup", "/admin", "/api"],
+  matcher: ["/", "/signin", "/signup", "/admin", "/api", "/t"],
 };

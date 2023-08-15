@@ -7,9 +7,9 @@ import CredentialsProvider from "next-auth/providers/credentials";
 // import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import clientPromise from "@/mongoDB/mongodb";
-import User from "@/mongoDB/USER" ;
+import User from "@/mongoDB/User" ;
 import dbConnect from "@/mongoDB/dbConnect";
-import Tenant from "@/mongoDB/TENANT";
+import Tenant from "@/mongoDB/Tenant";
 import { JWT } from "next-auth/jwt";
 
 export const authOptions: NextAuthOptions = {
@@ -51,6 +51,7 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, user, account, profile, isNewUser }) {
+      
       if(user)
       {
         return{
@@ -61,6 +62,7 @@ export const authOptions: NextAuthOptions = {
           role: user.role,
           email: user.email,
           tenantId: user.tenantId,
+          
           
         }
       }
@@ -78,6 +80,7 @@ export const authOptions: NextAuthOptions = {
         session.user._id = token._id;
         session.user.role = token.role;
         session.user.tenantId = token.tenantId;
+       
       }
       return session;
     },

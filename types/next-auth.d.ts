@@ -18,7 +18,9 @@ declare module "next-auth" {
       role: string;
       username: string;
       email: string;
-      tenantId: ObjectId };
+      tenantId: ObjectId 
+    
+    };
   }
   interface User {
     _id: ObjectId;
@@ -27,6 +29,7 @@ declare module "next-auth" {
     username: string;
     email: string;
     tenantId: ObjectId;
+
   
   }
 }

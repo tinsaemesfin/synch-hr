@@ -4,7 +4,7 @@ import { ObjectId } from "bson";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import dbConnect from "@/mongoDB/dbConnect";
-import Tenant from "@/mongoDB/TENANT";
+import Tenant from "@/mongoDB/Tenant";
 import { isValidObjectId } from "mongoose";
 import { notFound } from "next/navigation";
 

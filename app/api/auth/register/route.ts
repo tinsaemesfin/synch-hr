@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import dbConnect from "@/mongoDB/dbConnect";
-import User from "@/mongoDB/USER";
+import User from "@/mongoDB/User";
 // import { ObjectId } from "bson";
 import mongoose, { isValidObjectId } from "mongoose";
 import {ObjectId as objectId} from "mongodb";
-import Tenant from "@/mongoDB/TENANT";
+import Tenant from "@/mongoDB/Tenant";
 
 export const POST = async (req: Request) => {
   console.log("post register");

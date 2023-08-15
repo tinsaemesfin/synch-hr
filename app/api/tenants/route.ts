@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { getToken } from "next-auth/jwt";
 import dbConnect from "@/mongoDB/dbConnect";
-import Tenant from "@/mongoDB/TENANT";
-import User from "@/mongoDB/USER";
+import Tenant from "@/mongoDB/Tenant";
+import User from "@/mongoDB/User";
 
 export const POST = async (req: NextRequest) => {
   const token  = await getToken({req,raw:true})
