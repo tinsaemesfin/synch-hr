@@ -14,7 +14,7 @@ const sheetOrder = [
   "WorkingHour",
   "CompanyAllowance",
 ];
-export const DADe = async (fileUrl: string) => {
+const DADe = async (fileUrl: string) => {
   // 'use server'
   if(!fileUrl) return null;
   let excelFile,
@@ -34,20 +34,22 @@ export const DADe = async (fileUrl: string) => {
 
   try {
   let axiosResponse = await axios(fileUrl,{responseType:'arraybuffer'});
+ excelFile = xlsx.read(axiosResponse.data);
 
-     excelFile = xlsx.readFile(axiosResponse.data);
+// console.log(axiosResponse)
+     
      
   } catch (error) {
-    toast.error("Unsupported File Type" + error);
+    console.log("Unsupported File Type" + error);
   }
 if(!excelFile) 
 {
-  toast.error("Excel file not found" );
+  console.log("Excel file not found" );
   return null;
 
 }
 if (!equalsCheck(excelFile.SheetNames, sheetOrder)) {
-   toast.error("Sheet names are incorrect or in invalid Order");
+   console.log("Sheet names are incorrect or in invalid Order");
     return null
 }
 
@@ -61,7 +63,7 @@ try {
   companyAllowanceSheet = excelFile.Sheets[excelFile.SheetNames[5]];
 } catch (error) {
   console.log(error);
-  toast.error("Couldn't get Sheet(s)");
+  console.log("Couldn't get Sheet(s)");
   return;
 }
 try {
@@ -73,7 +75,7 @@ try {
   companyAllowancesData = xlsx.utils.sheet_to_json(companyAllowanceSheet);
   return personalData;
 } catch (error) {
-  toast.error("Couldn't get data from the sheet(s)");
+  console.log("Couldn't get data from the sheet(s)");
   // console.log(error);
   return;
 }

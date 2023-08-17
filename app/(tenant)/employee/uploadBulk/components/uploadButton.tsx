@@ -1,8 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
-import { publicRequest } from "@/mongoDB/request-methods";
 import { cn } from "@/libs/utils";
 import axios, { AxiosProgressEvent } from "axios";
 import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
@@ -21,6 +18,7 @@ const UploadButton = () => {
   const [loading, setLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const { file, isFileReady,setFile,setIsFileReady } = useEmployeeFile();
+  const router = useRouter();
 
   useEffect(() => {
     setIsMounted(true);
@@ -29,10 +27,9 @@ const UploadButton = () => {
   const onUpload = async (result: any) => {
     setFile(result.info.secure_url);
       
-    // router.refresh();
   };
 
-  const onClickButton = async () => {
+  const onUploadSubmit = async () => {
     if (!file) {
       console.log("no File ");
       return null;
@@ -42,12 +39,10 @@ const UploadButton = () => {
         fileUrl: file,
         toWhat: "EmployeeBulkUpload",
       });
-      // router.refresh();
 
       toast.success("File Uploaded Successfully");
-      setIsFileReady(true);
-
-      // router.push(`/employee/uploadBulk/confirmToUpload/${response.data.SavedFile._id}`);
+    router.refresh();      
+      router.push(`/employee/uploadBulk/${response.data.SavedFile._id}`);
     } catch (error) {
       console.log(error);
       toast.error("Error Happened" + error);
@@ -90,7 +85,7 @@ const UploadButton = () => {
           type="button"
           disabled={!file}
           onClick={() => {
-            onClickButton();
+            onUploadSubmit();
           }}
           className="mt-5"
         >

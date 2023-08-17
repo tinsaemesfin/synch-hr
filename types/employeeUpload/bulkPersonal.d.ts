@@ -1,0 +1,21 @@
+export type personalTypeBulk={
+fullName:string;
+employeeAttendanceId:number;
+nationality:string;
+birthDate:Date;
+phoneNumber:string;
+secondaryPhone?:string;
+email?:string;
+gender:string;
+employedDate:Date;
+street?:string;
+city?:string;
+state?:string;
+zip?:string;
+emergencyName:string;
+emergencyPhone:string;
+emergencyName2?:string;
+emergencyPhone2?:string;
+bankName:string;
+bankNumber:string;
+}
