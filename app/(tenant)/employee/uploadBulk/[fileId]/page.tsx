@@ -12,6 +12,9 @@ import { workingHourTypeBulk } from "@/types/employeeUpload/bulkWorkingHour";
 import { companyAllowanceTypeBulk } from "@/types/employeeUpload/bulkCompanyAllowance";
 import { PreparedData } from "@/libs/employeeUtils";
 import dbConnect from "@/mongoDB/dbConnect";
+import { employeeData } from "@/types/employeeWithOutName/EmployeeMerged";
+import { DataTable } from "@/components/ui/data-table";
+import { columns } from "./components/columns";
 type fileType = {
   _id: ObjectId;
   url: string;
@@ -89,15 +92,21 @@ const UploadBulkFilePage = async ({
     // console.log(error);
   }
 
-  const  a = PreparedData({personalData,contractData,allowanceData,overtimeData,workingHourData});
-  
-  // console.log(a?[0])
+  const  a:employeeData[]|undefined = PreparedData({personalData,contractData,allowanceData,overtimeData,workingHourData});
 
-  // return <DataViewForUpload fileUrl={file.url} />;
+
+  if(!a) return new Error("Couldn't get data from the sheet(s)");
+  // map through a and return array of personal data from a
+  const data = a.map((item) => {
+   return item.contract.PartimeOrFullTime;
+  });
+  
+  
+
   return(
     <>
     <h1>HIIIIIIIIIII</h1>
-    <p>{JSON.stringify(a)}</p>
+    <DataTable searchKey="fullName" columns={columns} data={a} />
     </>
   )
 };

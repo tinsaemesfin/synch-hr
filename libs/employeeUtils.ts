@@ -21,6 +21,7 @@ import {
   statusOfOvertime,
   statusOfWorkingHour,
 } from "@/types/CustomStatus/status";
+import { employeeData } from "@/types/employeeWithOutName/EmployeeMerged";
 
 interface PreparedDataProps {
   //   companyAllowancesData: companyAllowanceTypeBulk[];
@@ -72,17 +73,17 @@ export const PreparedData = ({
       bankName: employee.bankName,
       bankNumber: employee.bankNumber,
       employeeAttendanceId: employee.employeeAttendanceId,
-      ...(employee.street &&
-        employee.zip &&
-        employee.city &&
-        employee.state && {
+      ...(employee.street ||
+        employee.zip ||
+        employee.city ||
+        employee.state ? {
           address: {
             ...(employee.street && { street: employee.street }),
             ...(employee.city && { city: employee.city }),
             ...(employee.state && { street: employee.state }),
             ...(employee.zip && { street: employee.zip }),
           },
-        }),
+        }:null),
 
       emergency: {
         phoneNumber: employee.emergencyPhone,
@@ -190,13 +191,7 @@ export const PreparedData = ({
   }
 };
 
-type employeeData = {
-  ...personalPrepare;
-  contract: contractPrepareWN;
-  allowance: allowancePrepareWN[];
-  overtime: overtimePrepareWN;
-  workingHour: workingHourPrepareWN;
-};
+
 
 const mergeEmployeesData = ({
   arrayOfEmployeePersonal,
