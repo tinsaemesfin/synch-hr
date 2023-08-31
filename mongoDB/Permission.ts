@@ -1,3 +1,4 @@
+import { statusOfEmployeePermission } from "@/types/CustomStatus/status";
 import mongoose from "mongoose";
 
 const PermissionSchema = new mongoose.Schema(
@@ -7,7 +8,7 @@ const PermissionSchema = new mongoose.Schema(
     statusOfPermission: {
       type: String,
       required: true,
-      enum: ["requested", "rejected", "approved"]
+      enum: statusOfEmployeePermission
     },
 
     reason:{type:String,required:true},

@@ -39,6 +39,9 @@ export default async function middleware(req: NextRequest) {
       },
     });
   }
+   else if (path.startsWith("/employee") && !session) {
+    return NextResponse.redirect(new URL("/signin", req.url));
+  }
 
   return NextResponse.next();
 }

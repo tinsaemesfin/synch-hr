@@ -1,10 +1,10 @@
+
+import { statusOfAllowance } from "@/types/allowance";
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 const AllowanceSchema = new Schema(
   {
-    name: { type: String, required: true },
-    slag: { type: String, required: true },
-    _employeeId: {
+   _employeeId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "Employee",
@@ -12,21 +12,20 @@ const AllowanceSchema = new Schema(
     _companyAllowanceId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref:'CompanyAllowance'
+      ref: "CompanyAllowance",
     },
     amount: { type: mongoose.Types.Decimal128, required: true },
+    isNet: { type: Boolean, required: true, default: false },
     statusOfAllowance: {
       type: String,
-      enum: ["Active", "Pending", "Rejected", "Expired"],
+      enum: statusOfAllowance,
       required: true,
     },
-    net: { type: Boolean, required: true },
-    history: { type: Array, required: true },
-    tenantId:{
+    tenantId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Tenant",
       required: true,
-    }
+    },
   },
   { timestamps: true }
 );

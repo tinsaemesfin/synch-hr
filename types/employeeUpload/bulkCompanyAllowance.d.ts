@@ -4,5 +4,5 @@ name:string;
 type :number;
 frequency:number,
 minTaxable:number,
-minTaxableManage: number;
+minTaxableManager: number;
 }

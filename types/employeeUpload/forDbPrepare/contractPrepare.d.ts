@@ -4,7 +4,7 @@ import { statusOfContract } from "@/types/CustomStatus/status";
 export type contractPrepare={
     employeeName:string;
     permanentOrContract :permanentOrContract;
-    PartimeOrFullTime:typeOfContract;
+    typeOfContract:typeOfContract;
     grossSalary:number;
     rateOfSalary:rateOfSalary;
     titleOfPosition:string;

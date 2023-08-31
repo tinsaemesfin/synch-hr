@@ -1,3 +1,4 @@
+import { statusOfEmployee } from "@/types/employee";
 import { ObjectId } from "bson";
 import mongoose, { Collection } from "mongoose";
 
@@ -16,26 +17,17 @@ const employeeSchema = new Schema(
     activeContract: { type: Object, required: true },
     activeWorkingHour: { type: Object, required: true },
     activeOvertime: { type: Object, required: true },
-    activeAllowance: { type: Object, required: true },
+    activeAllowance: { type: Object,},
     statusOfEmployee: {
       type: String,
-      enum: [
-        "Active",
-        "Deactivated",
-        "Resigned",
-        "Terminated",
-        "Retired",
-        "Archived",
-        'Expired',
-        "Pending",
-      ],
+      enum: statusOfEmployee,
       required: true,
     },
     nationality: { type: String, required: true },
     address: { type: Object, required: false },
     beginningLeaveInfo: { type: Object, required: false },
-    bankName: { type: String, required: false },
-    bankNumber: { type: Number, required: false },
+    bankName: { type: String, required: true },
+    bankNumber: { type: Number, required: true },
     tenantId:{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Tenant",
@@ -50,6 +42,7 @@ const employeeSchema = new Schema(
   },
   { timestamps: true }
 );
+
 
 const Employee =
   mongoose.models.Employee ||

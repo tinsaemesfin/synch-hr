@@ -10,11 +10,14 @@ import { allowanceTypeBulk } from "@/types/employeeUpload/bulkAllowance";
 import { overtimeTypeBulk } from "@/types/employeeUpload/bulkOverTime";
 import { workingHourTypeBulk } from "@/types/employeeUpload/bulkWorkingHour";
 import { companyAllowanceTypeBulk } from "@/types/employeeUpload/bulkCompanyAllowance";
-import { PreparedData } from "@/libs/employeeUtils";
+import { CompanyAllowancePrepare, PreparedData } from "@/libs/employeeUtils";
 import dbConnect from "@/mongoDB/dbConnect";
 import { employeeData } from "@/types/employeeWithOutName/EmployeeMerged";
 import { DataTable } from "@/components/ui/data-table";
 import { columns } from "./components/columns";
+import { DataTableBulkEmployee } from "@/components/ui/data-table-bulkEmployee";
+import { Suspense } from "react";
+import { toast } from "react-hot-toast";
 type fileType = {
   _id: ObjectId;
   url: string;
@@ -92,21 +95,24 @@ const UploadBulkFilePage = async ({
     // console.log(error);
   }
 
-  const  a:employeeData[]|undefined = PreparedData({personalData,contractData,allowanceData,overtimeData,workingHourData});
+  const  preparedEmployeeData:employeeData[]|undefined = PreparedData({personalData,contractData,allowanceData,overtimeData,workingHourData});
+  const  preparedCompanyData:companyAllowanceTypeBulk[]|[] = CompanyAllowancePrepare(companyAllowancesData);
+
+ 
 
 
-  if(!a) return new Error("Couldn't get data from the sheet(s)");
-  // map through a and return array of personal data from a
-  const data = a.map((item) => {
-   return item.contract.PartimeOrFullTime;
-  });
+  if(!preparedEmployeeData) return new Error("Couldn't get data from the sheet(s)");
+  // TODO: parse only data's with all the required fields are filled!
   
+ 
   
 
   return(
     <>
-    <h1>HIIIIIIIIIII</h1>
-    <DataTable searchKey="fullName" columns={columns} data={a} />
+    <h1>View Submit Employees data</h1>
+    <Suspense fallback={<div>Loading...</div>}> 
+    <DataTableBulkEmployee searchKey="fullName" columns={columns} data={preparedEmployeeData}  preparedCompanyData={preparedCompanyData} preparedEmployeeData={preparedEmployeeData} />
+    </Suspense>
     </>
   )
 };

@@ -20,7 +20,7 @@ const EmployeeClient:React.FC<EmployeeClientProps> = ({
     <>
       <div className="flex items-center justify-between">
         <Heading
-          title={`Manege Employees`}
+          title={`Manage Employees`}
           description="Manage Your Company Employees"
         />
         <div className="space-x-2">
@@ -36,7 +36,7 @@ const EmployeeClient:React.FC<EmployeeClientProps> = ({
         
       </div>
       <Separator />
-      <DataTable searchKey="fullName" columns={columns} data={data} />
+      <DataTable searchKey="fullName" columns={columns} data={data}  />
       
     </>
   );

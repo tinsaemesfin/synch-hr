@@ -1,11 +1,13 @@
-"use client";
+
 import { getServerSession } from "next-auth";
 import React from "react";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import TenantSidebar from "./components/sidebar";
+import { useRouter } from "next/navigation";
 
-const TenantLayout = ({ children }: { children: React.ReactNode }) => {
-  // const session =  getServerSession(authOptions);
+const TenantLayout =  ({ children }: { children: React.ReactNode }) => {
+  // const session =  await getServerSession(authOptions);
+  // if(!session) return router.push('/signin');
   return (
     <div className="h-full relative">
       <div className="hidden h-full md:flex md:w-72 md:flex-col md:fixed md:inset-y-0 z-80 bg-blue-900">

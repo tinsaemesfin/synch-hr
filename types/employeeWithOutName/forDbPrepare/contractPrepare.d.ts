@@ -3,7 +3,7 @@ import { permanentOrContract, rateOfSalary, typeOfContract } from "@/types/contr
 
 export type contractPrepareWN={
     permanentOrContract :permanentOrContract;
-    PartimeOrFullTime:typeOfContract;
+    typeOfContract:typeOfContract;
     grossSalary:number;
     rateOfSalary:rateOfSalary;
     titleOfPosition:string;

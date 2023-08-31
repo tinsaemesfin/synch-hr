@@ -5,12 +5,14 @@ import xlsx from "xlsx";
 import { writeFile } from "fs/promises";
 import UploadedFile from "@/mongoDB/UploadedFile";
 import { ObjectId } from "bson";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 export const POST = async (req: NextRequest) => {
-  const token = await getToken({ req });
+  const session = await getServerSession(authOptions)
   const {fileUrl,toWhat} = await req.json();
   
-if(!token){
+if(!session){
   return NextResponse.json({ success: false , message:'Unauthenticated' });
 }
   if (!fileUrl) {
@@ -24,7 +26,7 @@ if(!token){
     const newFile = new UploadedFile({
       url:fileUrl,
       toWhat,
-      tenantId: new ObjectId(token.tenantId) ,
+      tenantId: new ObjectId(session.user.tenantId) ,
     })
     const SavedFile = await newFile.save();
     return NextResponse.json({ SavedFile }, { status: 200 });

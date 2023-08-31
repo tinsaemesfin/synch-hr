@@ -14,14 +14,14 @@ import { contractPrepareWN } from "@/types/employeeWithOutName/forDbPrepare/cont
 import { overtimePrepareWN } from "@/types/employeeWithOutName/forDbPrepare/overtimePrepare";
 import { workingHourPrepareWN } from "@/types/employeeWithOutName/forDbPrepare/workingHourPrepare";
 
-import { statusOfAllowance } from "../types/CustomStatus/status";
 import {
-  statusOfContract,
-  statusOfEmployee,
   statusOfOvertime,
-  statusOfWorkingHour,
 } from "@/types/CustomStatus/status";
 import { employeeData } from "@/types/employeeWithOutName/EmployeeMerged";
+import { statusOfEmployee } from "@/types/employee";
+import { rateOfSalary, statusOfContract } from "@/types/contract";
+import { statusOfAllowance } from "@/types/allowance";
+import { statusOfWorkingHour } from "@/types/workingHour";
 
 interface PreparedDataProps {
   //   companyAllowancesData: companyAllowanceTypeBulk[];
@@ -38,6 +38,9 @@ interface PreparedDataToDBProps {
   arrayOfEmployeeAllowance: allowancePrepare[];
   arrayOfEmployeeOvertime: overtimePrepare[];
   arrayOfEmployeeWorkingHour: workingHourPrepare[];
+}
+interface PrepareCompanyAllowanceDataProps {
+  companyAllowanceData: companyAllowanceTypeBulk[];
 }
 
 export const PreparedData = ({
@@ -59,11 +62,11 @@ export const PreparedData = ({
         }),
       },
 
-      birthDate: employee.birthDate,
+      birthDate: new Date(Date.UTC(0, 0, Number(employee.birthDate))),
       gender: employee.gender,
       ...(employee.email && { email: employee.email }),
       nationality: employee.nationality,
-      employedDate: employee.employedDate,
+      employedDate: new Date(Date.UTC(0, 0, Number(employee.employedDate))),
       statusOfEmployee: statusOfEmployee.Active,
       beginningLeaveInfo: {},
       activeContract: {},
@@ -73,17 +76,16 @@ export const PreparedData = ({
       bankName: employee.bankName,
       bankNumber: employee.bankNumber,
       employeeAttendanceId: employee.employeeAttendanceId,
-      ...(employee.street ||
-        employee.zip ||
-        employee.city ||
-        employee.state ? {
-          address: {
-            ...(employee.street && { street: employee.street }),
-            ...(employee.city && { city: employee.city }),
-            ...(employee.state && { street: employee.state }),
-            ...(employee.zip && { street: employee.zip }),
-          },
-        }:null),
+      ...(employee.street || employee.zip || employee.city || employee.state
+        ? {
+            address: {
+              ...(employee.street && { street: employee.street }),
+              ...(employee.city && { city: employee.city }),
+              ...(employee.state && { street: employee.state }),
+              ...(employee.zip && { street: employee.zip }),
+            },
+          }
+        : null),
 
       emergency: {
         phoneNumber: employee.emergencyPhone,
@@ -97,7 +99,9 @@ export const PreparedData = ({
           },
         }),
     };
-    ArrayOfEmployeePersonalData.push(personalEmployee);
+    // @ts-ignore
+    !Object.values(personalEmployee).includes(undefined) &&
+      ArrayOfEmployeePersonalData.push(personalEmployee);
   });
 
   let ArrayOfEmployeeContractData: contractPrepare[] = [];
@@ -105,17 +109,21 @@ export const PreparedData = ({
     let prepareContract: contractPrepare = {
       employeeName: contract.employeeName,
       statusOfContract: statusOfContract.Active,
-      PartimeOrFullTime: contract.PartimeOrFullTime,
+      typeOfContract: contract.typeOfContract,
       permanentOrContract: contract.permanentOrContract,
       titleOfPosition: contract.titleOfPosition,
       department: contract.department,
       rateOfSalary: contract.rateOfSalary,
-      startsFrom: contract.startsFrom,
-      ...(contract.endsOn && { endsOn: contract.endsOn }),
+      startsFrom: new Date(Date.UTC(0, 0, Number(contract.startsFrom))),
+      ...(contract.endsOn && {
+        endsOn: new Date(Date.UTC(0, 0, Number(contract.endsOn))),
+      }),
       grossSalary: contract.grossSalary,
       reason: "First Contract",
     };
-    ArrayOfEmployeeContractData.push(prepareContract);
+    // @ts-ignore
+    !Object.values(prepareContract).includes(undefined) &&
+      ArrayOfEmployeeContractData.push(prepareContract);
   });
 
   let ArrayOfEmployeeAllowanceData: allowancePrepare[] = [];
@@ -128,20 +136,24 @@ export const PreparedData = ({
       statusOfAllowance: statusOfAllowance.Active,
       isNet: allowance.isNet ? true : false,
     };
-    ArrayOfEmployeeAllowanceData.push(prepareAllowance);
+    // @ts-ignore
+    !Object.values(prepareAllowance).includes(undefined) &&
+      ArrayOfEmployeeAllowanceData.push(prepareAllowance);
   });
 
   let ArrayOfEmployeeOvertimeData: overtimePrepare[] = [];
   overtimeData.forEach((overtime) => {
     let prepareOvertime: overtimePrepare = {
-      before5Pm: overtime.before5Pm,
-      after5Pm: overtime.after5Pm,
+      before10Pm: overtime.before10Pm,
+      after10Pm: overtime.after10Pm,
       weekend: overtime.weekend,
       holyday: overtime.holyday,
       employeeName: overtime.employeeName,
       statusOfOvertime: statusOfOvertime.Active,
     };
-    ArrayOfEmployeeOvertimeData.push(prepareOvertime);
+    // @ts-ignore
+    !Object.values(prepareOvertime).includes(undefined) &&
+      ArrayOfEmployeeOvertimeData.push(prepareOvertime);
   });
   let ArrayOfEmployeeWorkingHourData: workingHourPrepare[] = [];
   workingHourData.forEach((workingHour) => {
@@ -167,7 +179,9 @@ export const PreparedData = ({
       canBeRemote: workingHour.canBeRemote ? true : false,
       haveOverNightShift: workingHour.haveOverNightShift ? true : false,
     };
-    ArrayOfEmployeeWorkingHourData.push(prepareWorkingHour);
+    // @ts-ignore
+    !Object.values(prepareWorkingHour).includes(undefined) &&
+      ArrayOfEmployeeWorkingHourData.push(prepareWorkingHour);
   });
 
   if (
@@ -179,7 +193,7 @@ export const PreparedData = ({
   ) {
     // console.log(ArrayOfEmployeeWorkingHourData.length)
 
-    const merged= mergeEmployeesData({
+    const merged = mergeEmployeesData({
       arrayOfEmployeePersonal: ArrayOfEmployeePersonalData,
       arrayOfEmployeeContract: ArrayOfEmployeeContractData,
       arrayOfEmployeeAllowance: ArrayOfEmployeeAllowanceData,
@@ -191,15 +205,13 @@ export const PreparedData = ({
   }
 };
 
-
-
 const mergeEmployeesData = ({
   arrayOfEmployeePersonal,
   arrayOfEmployeeContract,
   arrayOfEmployeeAllowance,
   arrayOfEmployeeOvertime,
   arrayOfEmployeeWorkingHour,
-}: PreparedDataToDBProps) : employeeData[]=> {
+}: PreparedDataToDBProps): employeeData[] => {
   const employeesData: employeeData[] = [];
   // const employeesWithError = [];
   arrayOfEmployeePersonal.forEach((personal, index) => {
@@ -218,6 +230,7 @@ const mergeEmployeesData = ({
     let overtimeD: overtimePrepare | undefined = arrayOfEmployeeOvertime.find(
       (overtime) => overtime.employeeName == personal.fullName
     );
+
     // if (index == 0) {
     //   console.log(personalD);
     //   console.log(contractD);
@@ -227,7 +240,7 @@ const mergeEmployeesData = ({
     // }
 
     if (personalD && contractD && workingHourD && allowanceD && overtimeD) {
-    //   console.log("Iam heree");
+      //   console.log("Iam heree");
       const { employeeName, ...contractOnly } = contractD;
       const { employeeName: employeeNameW, ...workingHourOnly } = workingHourD;
       const { employeeName: employeeNameO, ...overtimeOnly } = overtimeD;
@@ -298,3 +311,32 @@ const mergeEmployeesData = ({
   });
   return employeesData;
 };
+
+export function CompanyAllowancePrepare(
+  companyAllowancesData: companyAllowanceTypeBulk[]
+) {
+  const FinalData: companyAllowanceTypeBulk[] = [];
+  companyAllowancesData.map((allowance, index) => {
+    
+    if (index !== 0) {
+      // @ts-ignore
+      if (!Object.values(allowance).includes(undefined)) {
+        const { name, type, frequency, minTaxable, minTaxableManager, ...rest } =
+          allowance;
+        //  check before submitting name, name is unique and ddoesn't exist in the FinalData
+        const isNameUnique = FinalData.every((data) => data.name !== name);
+        if (isNameUnique) {
+          FinalData.push({
+            name,
+            type,
+            frequency,
+            minTaxable,
+            minTaxableManager
+          });
+        }
+      }
+    }
+  });
+
+  return FinalData;
+}

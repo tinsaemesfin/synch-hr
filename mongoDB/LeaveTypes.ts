@@ -1,3 +1,4 @@
+import { statusOfLeaveType } from "@/types/CustomStatus/status";
 import mongoose from "mongoose";
 
 
@@ -11,7 +12,7 @@ const LeaveTypesSchema = new mongoose.Schema(
     updateData:{type:Object,required:true},
     followUpLeaveSlag:{type:String},
     expireData:{type:Object,required:true},
-    status:{type:String,enum:['Active','Deactivated'],required:true},
+    status:{type:String,enum:statusOfLeaveType,required:true},
     isFrequencyBasedOnEmployedDate:{type:Boolean,required:true},
     tenantId:{
       type: mongoose.Schema.Types.ObjectId,

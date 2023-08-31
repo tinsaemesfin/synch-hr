@@ -1,9 +1,9 @@
-import { permanentOrContract, rateOfSalary, typeOfContract } from "@/types/contract";
+import { permanentOrContract, rateOfSalary, statusOfContract, typeOfContract } from "@/types/contract";
 import mongoose from "mongoose";
 
 const ContractSchema = new mongoose.Schema(
   {
-    statusOfContract: { type: String,enum:['Active,Deactivated','Expired','Ended'], required: true },
+    statusOfContract: { type: String,enum:statusOfContract, required: true },
     typeOfContract: { type: String,enum:typeOfContract, required: true },
     permanentOrContract: { type: String,enum:permanentOrContract, required: true },
     titleOfPosition: { type: String, required: true },

@@ -4,10 +4,12 @@ import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 
 import { employeeData } from "@/types/employeeWithOutName/EmployeeMerged";
 import moment from "moment";
+import { Separator } from "@/components/ui/separator";
 
 const columnHelper = createColumnHelper<employeeData>();
 
 export const columns: ColumnDef<employeeData>[] = [
+  
   columnHelper.group({
     id: "personal",
     header: () => (
@@ -20,7 +22,7 @@ export const columns: ColumnDef<employeeData>[] = [
         id: "fullName",
       },
       {
-        accessorKey: "personal.phoneNumber.primaryPhone",
+        accessorKey: "personal.phoneNumber",
         header: "Phone Number",
         cell: ({ row }) => (
           <div className="flex-col items-center gap-y-1">
@@ -55,9 +57,7 @@ export const columns: ColumnDef<employeeData>[] = [
         header: "Employed Date",
         cell: ({ row }) => (
           <>
-            {new Date(
-              Date.UTC(0, 0, Number(row.original.personal.employedDate))
-            ).toDateString()}
+            {new Date(row.original.personal.employedDate).toDateString()}
           </>
         ),
       },
@@ -132,7 +132,7 @@ export const columns: ColumnDef<employeeData>[] = [
         id: "permanentOrContract",
       },
       {
-        accessorKey: "contract.PartimeOrFullTime",
+        accessorKey: "contract.typeOfContract",
         header: "PartTime/FullTime",
       },
       {
@@ -170,20 +170,136 @@ export const columns: ColumnDef<employeeData>[] = [
       },
     ],
   }),
-
-  {
-    accessorKey: "allowance.name",
-    header: "Allowance Type",
-    
-    size: 200,
+  columnHelper.group({
+    id: "allowance",
+    header: () => <span className="text-blue-700 col-span-5">Allowance</span>,
+    columns: [
+      {
+        accessorKey: "allowance.name",
+        header: "Allowance Type",
+        // size: 200,
         cell: ({ row }) => (
-      <div className="flex-col items-center gap-y-1 w-20 bg-red-700">
-        {row.original.allowance.map((allowance)=>(
-         <div key={allowance.allowanceName} >
-         {allowance.allowanceName}-{allowance.amount}-{allowance.isNet}
-       </div>
-        ))}
-      </div>
+          <div className="flex-col items-center gap-y-1 w-[200px]">
+            {row.original.allowance.map((allowance) => (
+              <div key={allowance.allowanceName}>
+                {allowance.allowanceName}-{allowance.amount}-
+                {allowance.isNet ? "Net" : "Gross"}
+              </div>
+            ))}
+          </div>
+        ),
+      },
+    ],
+  }),
+
+  columnHelper.group({
+    id: "overtime",
+    header: () => <span className="text-blue-700 col-span-5">OverTime</span>,
+    columns: [
+      {
+        accessorKey: "overtime.data",
+        header: "OverTime Rate",
+        size: 200,
+        cell: ({ row }) => (
+          <div className="flex-col items-center gap-y-1 w-[200px]">
+            <p>
+              {" "}
+              {"After 10PM "}
+              {row.original.overtime.after10Pm}{" "}
+            </p>
+            <p>
+              {" "}
+              {"Before 10PM "}
+              {row.original.overtime.before10Pm}{" "}
+            </p>
+            <p>
+              {"Weekend "}
+              {row.original.overtime.weekend}{" "}
+            </p>
+            <p>
+              {" "}
+              {"Holiday "}
+              {row.original.overtime.holyday}{" "}
+            </p>
+          </div>
+        ),
+      },
+    ],
+  }),
+
+  columnHelper.group({
+    id: "workingHour",
+    header: () => (
+      <span className="text-blue-700 col-span-5">Working Hour Shift</span>
     ),
-  },
+
+    columns: [
+      {
+        accessorKey: "workingHour.data",
+        header: "Working Hour",
+        size: 180,
+        // minSize:300,
+
+        cell: ({ row }) => (
+          <div className="flex-col items-center justify-start  gap-y-4 w-[300px]">
+            <p>
+              {" "}
+              {row.original.workingHour.mondayIn &&
+                "Monday In " + row.original.workingHour.mondayIn + " "}
+              {row.original.workingHour.mondayOut &&
+                "Monday Out " + row.original.workingHour.mondayOut}{" "}
+            </p>
+            <p>
+              {" "}
+              {row.original.workingHour.tuesdayIn &&
+                "Tuesday In " + row.original.workingHour.tuesdayIn + " "}
+              {row.original.workingHour.tuesdayOut &&
+                "Tuesday Out " + row.original.workingHour.tuesdayOut}{" "}
+            </p>
+
+            <p>
+              {" "}
+              {row.original.workingHour.wednesdayIn &&
+                "Wednesday In " + row.original.workingHour.wednesdayIn + " "}
+              {row.original.workingHour.wednesdayOut &&
+                "Wednesday Out " + row.original.workingHour.wednesdayOut}{" "}
+            </p>
+            <p>
+              {" "}
+              {row.original.workingHour.thursdayIn &&
+                "thursday In " + row.original.workingHour.thursdayIn + " "}
+              {row.original.workingHour.thursdayOut &&
+                "Thursday Out " + row.original.workingHour.thursdayOut}{" "}
+            </p>
+            <p>
+              {" "}
+              {row.original.workingHour.fridayIn &&
+                "friday In " + row.original.workingHour.fridayIn + " "}
+              {row.original.workingHour.fridayOut &&
+                "friday Out " + row.original.workingHour.fridayOut}{" "}
+            </p>
+            <p>
+              {row.original.workingHour.saturdayIn &&
+                "saturday In " + row.original.workingHour.saturdayIn + " "}
+              {row.original.workingHour.saturdayOut &&
+                "saturday Out " + row.original.workingHour.saturdayOut}{" "}
+            </p>
+            <p>
+              {" "}
+              {row.original.workingHour.sundayIn &&
+                "sunday In " + row.original.workingHour.sundayIn + " "}
+              {row.original.workingHour.sundayOut &&
+                "sunday Out " + row.original.workingHour.sundayOut + " "}{" "}
+            </p>
+            <p>{row.original.workingHour.canBeRemote && "can be remote"} </p>
+            <p>
+              {" "}
+              {row.original.workingHour.haveOverNightShift &&
+                "have over night shift"}{" "}
+            </p>
+          </div>
+        ),
+      },
+    ],
+  }),
 ];

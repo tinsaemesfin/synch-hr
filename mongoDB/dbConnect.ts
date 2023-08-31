@@ -28,6 +28,8 @@ async function dbConnect() {
    catch(e){
     console.log('!!!!!!!!!!!!!!!!!! DB CONNECTION FAILED !!!!!!!!!!!!!!!!!')
      console.log(e)
+    return new Error('DB CONNECTION FAILED')
+
    }
 
 

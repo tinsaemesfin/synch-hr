@@ -1,3 +1,4 @@
+import { statusOfCompanyAllowance } from "@/types/companyAllowance";
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 const CompanyAllowanceSchema = new Schema(
@@ -7,7 +8,7 @@ const CompanyAllowanceSchema = new Schema(
     type: { type: String, required: true },
     minTaxable: { type: mongoose.Types.Decimal128, required: true },
     minTaxableManager: { type: mongoose.Types.Decimal128, required: true },
-    statusOfAllowance: { type: String, required: true },
+    statusOfAllowance: { type: String, enum:statusOfCompanyAllowance, required: true },
     frequency: { type: String, required: true },
     tenantId:{
       type: mongoose.Schema.Types.ObjectId,

@@ -1,12 +1,13 @@
+import { statusOfOvertime } from "@/types/CustomStatus/status";
 import mongoose from "mongoose";
 
 const OvertimeSchema = new mongoose.Schema(
   {
-    before5Pm: { type: mongoose.Types.Decimal128, required: true },
-    after5Pm: { type: mongoose.Types.Decimal128, required: true },
+    before10Pm: { type: mongoose.Types.Decimal128, required: true },
+    after10Pm: { type: mongoose.Types.Decimal128, required: true },
     weekend: { type: mongoose.Types.Decimal128, required: true },
     holyday: { type: mongoose.Types.Decimal128, required: true },
-    statusOfOvertime: { type: String, enum:['Active','Deactivated'], required: true },
+    statusOfOvertime: { type: String, enum:statusOfOvertime, required: true },
     _employeeId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
