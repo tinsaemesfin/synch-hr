@@ -97,10 +97,15 @@ export const POST = async (req: NextRequest) => {
         continue;
       }
 
-      const newWorkingHour = new WorkingHour({
-        ...employee.workingHour,
+      const {haveOverNightShift,canBeRemote,statusOfWorkingHour,...wt} = employee.workingHour;
+
+      const newWorkingHour = new WorkingHour({       
         _employeeId: savedEmployee._id,
         tenantId: session.user.tenantId,
+        haveOverNightShift,
+        canBeRemote,
+        statusOfWorkingHour,
+        workingHourTime:{...wt}
       });
 
       try {
@@ -122,7 +127,7 @@ export const POST = async (req: NextRequest) => {
         ...employee.overtime,
         tenantId: session.user.tenantId,
         _employeeId: savedEmployee._id,
-      }).save;
+      });
       try {
         savedOvertime = await newOvertime.save({ session: dbSession });
       } catch (error) {

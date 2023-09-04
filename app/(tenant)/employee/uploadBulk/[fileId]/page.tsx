@@ -53,7 +53,6 @@ const UploadBulkFilePage = async ({
    await dbConnect();
     file = await UploadedFile.findById(params.fileId);
   } catch (error) {
-    console.log('___________-------------------------------------------------')
     console.log(error);
     return new Error("something went wrong inSide File");
   }

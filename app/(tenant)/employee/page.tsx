@@ -12,7 +12,7 @@ const EmployeePage = async ({
   searchParams: { [key: string]: string | string[] | undefined };
 }) => {
     const page = searchParams['page'] ??'1';
-    const per_page = searchParams['per_page'] ??'20';
+    const per_page = searchParams['per_page'] ??'10';
     const start = (Number(page)-1)*Number(per_page);
     const end = start+Number(per_page);
     const NPerPage = Number(per_page);
@@ -34,15 +34,15 @@ const EmployeePage = async ({
     employedDate:'desc'
   }).limit(NPerPage).skip(start);
 
-  console.log('employees',employees )
+  console.log('employees', employees.length)
   
   const formattedEmployees:EmployeeColumn[]=employees.map((employee)=>(
     {
-        id:employee._id,
+        id:String(employee._id),
         fullName:employee.fullName,
         employedDate:employee.employedDate,
         statusOfEmployee:employee.statusOfEmployee,
-        phoneNumber:employee.phoneNumber,
+        phoneNumber:employee.phoneNumber.primaryPhone,
     }
   ));
   return (
