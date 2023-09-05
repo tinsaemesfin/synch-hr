@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import Avatar from '../../../../public/Avatar.png'
 import React from "react";
 import { cn } from "@/libs/utils";
+import dbConnect from "@/mongoDB/dbConnect";
 
 const Layout = async ({
   children,
@@ -16,6 +17,7 @@ const Layout = async ({
 }) => {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/signin");
+    await dbConnect();
   const employee = await Employee.findOne({
     _id: params.employeeId,
     tenantId: session.user.tenantId,
@@ -52,10 +54,10 @@ const Layout = async ({
                     Team
                   </h6>
                   <small className="text-secondary-foreground">
-                    {employee.activeContract.titleOfPosition} TOP
+                    {employee.activeContract.titleOfPosition}
                   </small>
                   <div className="text-sm mt-[5px] font-medium">
-                    Employee ID : CLT-0001
+                    Employee ID : {employee.id}
                   </div>
                   <div className="text-[13px] text-secondary-foreground">
                     Date of Join :{" "}
@@ -79,7 +81,7 @@ const Layout = async ({
                       Email:
                     </span>
                     {/* <span className="text-[#0d6efd] text-[15px] block overflow-hidden"> */}
-                      <span className={cn('text-[15px] block overflow-hidden',employee.email ? 'text-[#0d6efd]':'text-red')} >
+                      <span className={cn('text-[15px] block overflow-hidden text-blue-600',employee.email ? 'text-[#0d6efd]':'text-red-800')} >
                         {employee.email ? employee.email : "No Email Address"}
                     </span>
                   </li>
@@ -115,7 +117,6 @@ const Layout = async ({
                 </ul>
               </div>
             </div>
-            <div className="absolute top-0 right-0"></div>
           </div>
         </div>
       </div>

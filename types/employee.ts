@@ -1,7 +1,8 @@
 import { ObjectId } from "mongoose";
+import { statusOfOvertime } from "./CustomStatus/status";
 
 export interface IEmployee {
-  _id: ObjectId;
+  _id: string;
   fullName: string;
   email: string;
   phoneNumber: string;
@@ -18,7 +19,7 @@ export interface IEmployee {
   beginningLeaveInfo?: Object;
   bankName: string;
   bankNumber: number;
-  tenantId: ObjectId;
+  tenantId: string;
   employeeAttendanceId?: number | null;
   createdAt?: Date;
   updatedAt?: Date;
@@ -38,6 +39,29 @@ type address = {
   city?: string;
   state?: string;
   zip?: string;
+}
 
+export type activeOvertime={
+  
+    before10Pm: {
+      $numberDecimal: number;
+    },
+    after10Pm: {
+      $numberDecimal: number;
+    },
+    weekend: {
+      $numberDecimal: number;
+    },
+    holyday: {
+      $numberDecimal: number;
+    },
+   statusOfOvertime: statusOfOvertime,
+    _employeeId: string,
+    tenantId: string,
+    _id: string,
+    createdAt: Date,
+    updatedAt: Date,
+    __v: number
+  
 }
 

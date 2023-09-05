@@ -9,7 +9,7 @@ export interface IContract {
   department: string;
   startsFrom: Date;
   endsOn?: Date;
-  grossSalary: Number;
+  grossSalary: {$numberDecimal:number};
   rateOfSalary: rateOfSalary;
   reason: string;
   _employeeId: ObjectId;

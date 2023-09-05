@@ -12,8 +12,8 @@ export interface IOvertime {
 }
 
 type otDetails = {
-  before10Pm: number;
-  after10Pm: number;
-  weekend: number;
-  holyday: number;
+  before10Pm: {$numberDecimal:number};
+  after10Pm: {$numberDecimal:number};
+  weekend: {$numberDecimal:number};
+  holyday: {$numberDecimal:number};
 };

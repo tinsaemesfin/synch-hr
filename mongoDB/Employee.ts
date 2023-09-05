@@ -17,7 +17,7 @@ const employeeSchema = new Schema(
     activeContract: { type: Object, required: true },
     activeWorkingHour: { type: Object, required: true },
     activeOvertime: { type: Object, required: true },
-    activeAllowance: { type: Object,},
+    activeAllowance: { type: Object},
     statusOfEmployee: {
       type: String,
       enum: statusOfEmployee,
