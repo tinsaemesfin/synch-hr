@@ -13,35 +13,20 @@ export interface IWorkingHour {
   }
 
   type WorkingHourTime = {
-    monday?:{
-      in?: string;
-      out?: string;
-    },
-    tuesday?:{
-      in?: string;
-      out?: string;
-    },
-    wednesday?:{
-      in?: string;
-      out?: string;
-    },
-    thursday?:{
-      in?: string;
-      out?: string;
-    },
-    friday?:{
-      in?: string;
-      out?: string;
-    },
-    saturday?:{
-      in?: string;
-      out?: string;
-    },
-    sunday?:{
-      in?: string;
-      out?: string;
-    },
-
+    mondayIn?: string,
+    mondayOut?: string,
+    tuesdayIn?: string,
+    tuesdayOut?: string,
+    wednesdayIn?: string,
+    wednesdayOut?: string,
+    thursdayIn?: string,
+    thursdayOut?: string,
+    fridayIn?: string,
+    fridayOut?: string,
+    saturdayIn?: string,
+    saturdayOut?: string,
+    sundayIn?: string,
+    sundayOut?: string,
   }
   export enum statusOfWorkingHour {
     Active="Active",

@@ -1,7 +1,7 @@
 import { ObjectId } from "mongoose";
 
 export interface ICompanyAllowance {
-  _id: ObjectId;
+  _id: string;
   name: string;
   type: number;
   frequency: number;

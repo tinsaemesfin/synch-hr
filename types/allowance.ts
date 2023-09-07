@@ -3,7 +3,7 @@ import { ObjectId } from "mongoose";
 export interface IAllowance {
     _id: ObjectId;
     _companyAllowanceId: ObjectId;
-    amount: number;
+    amount: {$numberDecimal: number };
     _employeeId: ObjectId;
     isNet:boolean;
     statusOfAllowance: statusOfAllowance;

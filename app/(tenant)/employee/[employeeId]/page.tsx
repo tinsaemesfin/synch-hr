@@ -8,21 +8,33 @@ import { Profile } from "./(tabs)/(profile)/profile";
 import { IEmployee } from "@/types/employee";
 import axios, { AxiosResponse } from "axios";
 import {cookies} from 'next/headers'
+import { create } from "zustand";
+import { useAnEmployee } from "@/state/useEmployee";
+import { Contract } from "./(tabs)/(contract)/contract";
+import { WorkingHour } from "./(tabs)/(workingHour)/workingHour";
+import { Overtime } from "./(tabs)/(overtime)/overtime";
+import { Allowance } from "./(tabs)/(allowance)/allowance";
 
-const page = async ({ params }: { params: { employeeId: string } }) => {
+
+const Page = async ({ params }: { params: { employeeId: string } }) => {
   let employee: IEmployee | null = null;
+  let token :string|undefined ;
+
+
   
   try {
     await dbConnect();
     const cookieStore = cookies()
-  const token = cookieStore.get('next-auth.session-token')
+  const rawToken = cookieStore.get('next-auth.session-token')
+  token = rawToken?.value
   if(!token) return null
 
     // FIXME :  JUST FOR MAKING EASY FOR CHECKING
     const employeeResponse : AxiosResponse = await axios.get(`${process.env.BASE_URL}/api/employee/${params.employeeId}`,{
-      headers:{Authorization:'Bearer '+ token.value}
+      headers:{Authorization:'Bearer '+ token}
     });
     employeeResponse.status === 200 && (employee = employeeResponse.data._doc) 
+    
 
     
     // make an axios request to get the employee data
@@ -31,7 +43,9 @@ const page = async ({ params }: { params: { employeeId: string } }) => {
   } catch (error) {
     console.log('ERRRORRR');
   }
-  if(!employee) return new Error('Employee not found');
+  if(!employee||!token) return new Error('Employee not found');
+  console.log('In Page')
+  
 
   return (
     <div>
@@ -49,13 +63,16 @@ const page = async ({ params }: { params: { employeeId: string } }) => {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="profile">
-          <Profile employee={employee} />
-       
+          <Profile employee={employee} token={token} />       
         </TabsContent>
-        <TabsContent value="contract">Contract.</TabsContent>
-        <TabsContent value="workingHour">Working Hour.</TabsContent>
-        <TabsContent value="overtime">OverTime.</TabsContent>
-        <TabsContent value="allowance">Allowance.</TabsContent>
+        <TabsContent value="contract">
+          <Contract employee={employee} token={token} />
+        </TabsContent>
+        <TabsContent value="workingHour">
+          <WorkingHour employee={employee} token={token} />
+           </TabsContent>
+        <TabsContent value="overtime"> <Overtime employee={employee} token={token} /> </TabsContent>
+        <TabsContent value="allowance"><Allowance employee={employee} token={token} /> </TabsContent>
         <TabsContent value="otForm">OtForm.</TabsContent>
         <TabsContent value="attendance">Attendance</TabsContent>
         <TabsContent value="leaveAndPermission">
@@ -66,4 +83,4 @@ const page = async ({ params }: { params: { employeeId: string } }) => {
   );
 };
 
-export default page;
+export default Page;

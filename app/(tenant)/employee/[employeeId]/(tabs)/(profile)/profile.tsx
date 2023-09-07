@@ -1,20 +1,36 @@
 "use client";
+// TODO: update emergency Contacts and informations with the Attendnace Id
 
 import { IContract } from "@/types/contract";
 import { IEmployee, activeOvertime } from "@/types/employee";
 import { IOvertime } from "@/types/overTime";
 import { PencilIcon } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import UpdateBankAlertDialog from "./(UpdateDialogs)/updateBankAlertDialog";
+import { useAnEmployee } from "@/state/useEmployee";
+import { useStore } from "@/state/useExample";
 
 interface IProfileProps {
   employee: IEmployee;
+  token:string
 }
-export const Profile: React.FC<IProfileProps> = ({ employee }) => {
+export const Profile: React.FC<IProfileProps> = ({ employee,token }) => {
+  const anEmployee = useAnEmployee();
+  
+  useEffect(()=>{
+    anEmployee.setToken(token);
+    anEmployee.setEmployee(employee);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[])
+  
   const emergency = [employee.emergency];
   const contract = employee.activeContract as IContract;
   const ot = employee.activeOvertime as activeOvertime;
   employee.emergency2 && emergency.push(employee.emergency2);
+ 
+
+  
+  // 
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
@@ -46,10 +62,6 @@ const Bank = ({
               // onClick={}
               onClick={() => {
                 setShowModal(true);
-
-                // setRequestFrom("bank");
-                // setData({bankName:employee.bankName , bankNumber:employee.bankNumber});
-                // setShowModal(true);
               }}
               className="block float-right text-xs leading-6 bg-[#eeeeee] border border-select rounded-3xl w-[26px] min-h-[26px] text-center p-1 text-[#0063ba] cursor-pointer"
             >
@@ -82,10 +94,10 @@ const Bank = ({
           onClose={() => {
             setShowModal(false);
           }}
-          data={{ bankName: bankName, bankNumber: bankNumber }}
+          data={{ bankName: bankName, bankNumber: bankNumber, }}
         />
       )}
-    </>
+    </> 
   );
 };
 
@@ -94,12 +106,14 @@ const EmergencyContact = ({
 }: {
   emergency: { contact: string; phoneNumber: string }[];
 }) => {
+  const [showModal, setShowModal] = useState(false);
   return (
+    <>
     <div className="card shadow-header border border-cardBorder relative flex flex-col min-h-[150px] mb-[30px]">
       <div className="p-4 flex-grow flex-shrink basis-auto">
         <h3 className="text-xl mb-5">
           Emergency Information{" "}
-          <span className="block float-right text-xs leading-6 bg-[#eeeeee] border  rounded-full w-[35px] max-h-[35px] text-center p-1 text-[#0063ba]">
+          <span onClick={()=>setShowModal(true)} className="block float-right text-xs leading-6 bg-[#eeeeee] border  rounded-full w-[35px] max-h-[35px] text-center p-1 text-[#0063ba]">
             <PencilIcon size={20} />
           </span>
         </h3>
@@ -129,6 +143,8 @@ const EmergencyContact = ({
         </ul>
       </div>
     </div>
+    {showModal }
+    </>
   );
 };
 
