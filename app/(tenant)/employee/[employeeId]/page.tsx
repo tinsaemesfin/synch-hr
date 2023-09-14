@@ -14,6 +14,7 @@ import { Contract } from "./(tabs)/(contract)/contract";
 import { WorkingHour } from "./(tabs)/(workingHour)/workingHour";
 import { Overtime } from "./(tabs)/(overtime)/overtime";
 import { Allowance } from "./(tabs)/(allowance)/allowance";
+import Attendance from "./(tabs)/(attendance)/attendance";
 
 
 const Page = async ({ params }: { params: { employeeId: string } }) => {
@@ -74,7 +75,7 @@ const Page = async ({ params }: { params: { employeeId: string } }) => {
         <TabsContent value="overtime"> <Overtime employee={employee} token={token} /> </TabsContent>
         <TabsContent value="allowance"><Allowance employee={employee} token={token} /> </TabsContent>
         <TabsContent value="otForm">OtForm.</TabsContent>
-        <TabsContent value="attendance">Attendance</TabsContent>
+        <TabsContent value="attendance"><Attendance employee={employee} token={token} /></TabsContent>
         <TabsContent value="leaveAndPermission">
           Leave and Permission
         </TabsContent>

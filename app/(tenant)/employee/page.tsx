@@ -32,7 +32,8 @@ const EmployeePage = async ({
     phoneNumber: 1,    
   }).sort({
     employedDate:'desc'
-  }).limit(NPerPage).skip(start);
+  // }).limit(NPerPage).skip(start);
+});
 
   console.log('employees', employees.length)
   

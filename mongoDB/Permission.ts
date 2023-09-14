@@ -1,10 +1,20 @@
-import { statusOfEmployeePermission } from "@/types/CustomStatus/status";
+
+import { statusOfEmployeePermission } from "@/types/permission";
 import mongoose from "mongoose";
 
 const PermissionSchema = new mongoose.Schema(
   {
     _employeeId: { type: mongoose.Schema.Types.ObjectId, ref: "Employee",required:true},
-    date:{type:Object,required:true},
+    date: {
+      from: {
+        type: Date,
+        required: true,
+      },
+      to: {
+        type: Date,
+        required: true,
+      },
+    },
     statusOfPermission: {
       type: String,
       required: true,

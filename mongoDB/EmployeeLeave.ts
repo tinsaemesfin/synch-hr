@@ -1,4 +1,4 @@
-import { statusOfEmployeeLeave } from "@/types/CustomStatus/status";
+import { statusOfEmployeeLeave } from "@/types/employeeLeave";
 import mongoose from "mongoose";
 
 const EmployeeLeaveSchema = new mongoose.Schema(
@@ -10,7 +10,7 @@ const EmployeeLeaveSchema = new mongoose.Schema(
       required: true,
       enum: statusOfEmployeeLeave,
     },
-    dayData: {
+    date: {
       from: {
         type: Date,
         required: true,

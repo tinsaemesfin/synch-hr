@@ -19,21 +19,9 @@ export enum FrequencyOFAllowance{
   byService='By Service',
 }
 
-export enum statusOfEmployeeLeave{
-  Pending="Pending",
-  Approved="Approved",
-  Rejected="Rejected",
-  Canceled="Canceled",
-  Completed="Completed",
-}
+
 export enum statusOfLeaveType{
   Active="Active",
   Deactivated="Deactivated",
 }
-export enum statusOfEmployeePermission{
-  Pending="Pending",
-  Approved="Approved",
-  Rejected="Rejected",
-  Canceled="Canceled",
-  Completed="Completed",
-}
+

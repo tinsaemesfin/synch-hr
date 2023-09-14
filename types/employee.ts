@@ -1,5 +1,6 @@
 import { ObjectId } from "mongoose";
 import { statusOfOvertime } from "./CustomStatus/status";
+import { IWorkingHour } from "./workingHour";
 
 export interface IEmployee {
   _id: string;
@@ -12,7 +13,7 @@ export interface IEmployee {
   emergency: emergency;
   emergency2?: emergency|undefined;
   activeContract: object;
-  activeWorkingHour: object;
+  activeWorkingHour: IWorkingHour|object;
   activeOvertime: object;
   activeAllowance?: object;
   statusOfEmployee: statusOfEmployee;
