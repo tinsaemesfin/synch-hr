@@ -8,7 +8,7 @@ export default function Home() {
  
 
 
-
+if(status === 'loading') return <h1> Loading ... </h1>
   return (
    <h1> DashBoard 
     Home Page {JSON.stringify(data)} {

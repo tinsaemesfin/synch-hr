@@ -6,8 +6,19 @@ import { NextResponse } from 'next/server';
 
 
 export const GET = async (req: Request) => {
+    let username ,password;
     try {
-        const { username, password } = await req.json();
+        try {
+            const a = await req.text()
+        const data = JSON.parse(a)
+        const { username:un , password:pw } = await req.json();
+        
+        username = un;
+        password = pw;
+            
+        } catch (error) {
+            console.log('from User +++++++++++++++++++++++++++++++++++++++++',error)
+        }
         if (!username || !password) {
         return NextResponse.json({ message: "invalid Data" }, { status: 422 });
         }
@@ -24,7 +35,8 @@ export const GET = async (req: Request) => {
         }
         return NextResponse.json({ user });
     } catch (e) {
-        console.log(e);
+        console.log(e,'ERRRRRRRRRRRRRRRRRRRRRRRRROR from ');
         return NextResponse.json({ message: "Something went wrong" }, { status: 500 });
     }
     }
+    export const dynamic = "force-dynamic";
