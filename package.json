@@ -45,7 +45,7 @@
     "moment-timezone": "^0.5.43",
     "mongodb": "^5.7.0",
     "mongoose": "^7.4.2",
-    "next": "13.4.13",
+    "next": "^13.4.13",
     "next-auth": "^4.22.4",
     "next-cloudinary": "^4.18.0",
     "postcss": "8.4.27",

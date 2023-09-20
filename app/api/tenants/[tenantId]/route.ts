@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import prismadb from "@/Prisma";
 import { getSession } from "next-auth/react";
+import dbConnect from "@/mongoDB/dbConnect";
+import Tenant from "@/mongoDB/Tenant";
 
 interface IParams {
   tenantId: string;
@@ -16,10 +17,9 @@ export const GET = async (
     if (!tenantId) {
       return NextResponse.json({ message: "invalid Data" }, { status: 422 });
     }
-    const tenant = await prismadb.tenant.findUnique({
-      where: {
-        id: tenantId,
-      },
+    dbConnect()
+    const tenant = await Tenant.findOne({      
+    _id: tenantId,      
     });
     return NextResponse.json({ tenant }, { status: 201 });
   } catch (e) {

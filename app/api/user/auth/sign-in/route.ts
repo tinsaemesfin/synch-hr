@@ -1,6 +1,7 @@
+import User from '@/mongoDB/User';
+import dbConnect from '@/mongoDB/dbConnect';
 import  bcrypt from 'bcrypt';
-import prismadb from '@/Prisma';
-import { connectToDatabase } from '@/libs/server-helpers';
+
 import { NextResponse } from 'next/server';
 
 
@@ -10,11 +11,9 @@ export const GET = async (req: Request) => {
         if (!username || !password) {
         return NextResponse.json({ message: "invalid Data" }, { status: 422 });
         }
-        await connectToDatabase();
-        const user = await prismadb.user.findFirst({
-        where: {
-            username,
-        },
+        await dbConnect();
+        const user = await User.findOne({       
+            username:username,       
         });
         if (!user) {
         return NextResponse.json({ message: "invalid Data" }, { status: 422 });
@@ -27,7 +26,5 @@ export const GET = async (req: Request) => {
     } catch (e) {
         console.log(e);
         return NextResponse.json({ message: "Something went wrong" }, { status: 500 });
-    } finally {
-        await prismadb.$disconnect();
     }
     }
