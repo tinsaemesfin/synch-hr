@@ -26,7 +26,7 @@ export default async function AdminHome() {
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
-        <AdminClient data={form}  />
+        <AdminClient data={formattedTenants}  />
       </div>
     </div>
   );
