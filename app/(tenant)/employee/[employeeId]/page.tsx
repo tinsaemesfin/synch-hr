@@ -42,10 +42,11 @@ const Page = async ({ params }: { params: { employeeId: string } }) => {
     // use axios its a must
 
   } catch (error) {
-    console.log('ERRRORRR');
+    console.log('Error In page employee/[employeeId] ');
+    console.log(error)
   }
   if(!employee||!token) return new Error('Employee not found');
-  console.log('In Page')
+
   
 
   return (

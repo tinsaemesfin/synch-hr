@@ -29,7 +29,7 @@ export const Allowance: React.FC<IProps> = async ({ employee, token }) => {
   }
 
   if (!allowance || allowance.length === 0) return <div>allowance not found</div>;
-  console.log(allowance[0])
+ 
   //
   return (
     <>

@@ -27,9 +27,10 @@ export const Profile: React.FC<IProfileProps> = ({ employee,token }) => {
   const contract = employee.activeContract as IContract;
   const ot = employee.activeOvertime as activeOvertime;
   employee.emergency2 && emergency.push(employee.emergency2);
+  console.log('Profile')
  
 
-  
+
   // 
   return (
     <>
@@ -340,3 +341,13 @@ const AttendanceId = ({ attendaceId }: { attendaceId: number }) => {
     </div>
   );
 };
+
+
+
+
+
+
+
+
+
+

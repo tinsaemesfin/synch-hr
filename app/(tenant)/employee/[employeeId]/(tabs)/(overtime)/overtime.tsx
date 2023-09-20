@@ -34,7 +34,9 @@ export const Overtime: React.FC<IProps> = async ({ employee, token }) => {
 
   if (!overtime || overtime.length === 0) return <div>Overtime not found</div>;
 
-  console.log(overtime);
+  console.log('OverTime');
+
+  
   //
   return (
     <>

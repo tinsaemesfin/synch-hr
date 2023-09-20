@@ -39,6 +39,7 @@ const UploadButton = () => {
         fileUrl: file,
         toWhat: "EmployeeBulkUpload",
       });
+      console.log(response)
 
       toast.success("File Uploaded Successfully");
     router.refresh();      

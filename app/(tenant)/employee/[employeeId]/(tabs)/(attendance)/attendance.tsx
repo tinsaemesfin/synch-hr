@@ -43,6 +43,7 @@ const Attendance: React.FC<IProps> = ({ employee, token }) => {
   IattendaceEmployee | undefined
   >();
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [ReadyData, setReadyData] = React.useState();
 
   useEffect(() => {
     (async () => {
@@ -62,12 +63,12 @@ const Attendance: React.FC<IProps> = ({ employee, token }) => {
               }
             );
             setLoading(false);
-            console.log(attendaceResponse)
+            
             attendaceResponse.status === 200 &&
               setAttendance(attendaceResponse.data);
           };
           getAttendance();
-          console.log(attendance) // call the function
+          // call the function
         } catch (error) {
           setLoading(false);
           console.log(error);
@@ -78,6 +79,10 @@ const Attendance: React.FC<IProps> = ({ employee, token }) => {
     // 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date, withPenality, employee._id, token]); // added missing dependencies
+
+useEffect(()=>{
+
+},[attendance])
 
   const renderTableHeader = () => {
     let headers = [];
