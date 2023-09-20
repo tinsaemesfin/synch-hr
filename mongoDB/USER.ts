@@ -32,8 +32,9 @@ const userSchema = new Schema(
       required: true,
     },
     tenantId: {
-      type: ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
+      ref: "Tenant",
     },
     role: {
       type: String,
@@ -43,5 +44,5 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-const User = mongoose.models.User || mongoose.model("User", userSchema,"User");
+const User = mongoose.models.User || mongoose.model("User", userSchema, "User");
 export default User;
