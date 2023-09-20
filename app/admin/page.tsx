@@ -6,7 +6,7 @@ import AdminClient from "./components/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { ObjectId } from "bson";
-import Tenant from "@/mongoDB/Tenant";
+import Tenant from "../../mongoDB/Tenant";
 
 export default async function AdminHome() {
   const session = await getServerSession(authOptions);
