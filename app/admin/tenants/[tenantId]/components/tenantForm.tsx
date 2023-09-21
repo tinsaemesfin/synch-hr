@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Tenant } from "@prisma/client";
+
 import bcrypt from "bcrypt";
 
 import { useParams, useRouter } from "next/navigation";
