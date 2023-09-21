@@ -15,6 +15,7 @@ export const GET = async (req: Request) => {
         
         username = un;
         password = pw;
+        console.log('userAuthLogin',username,password)
             
         } catch (error) {
             console.log('from User +++++++++++++++++++++++++++++++++++++++++',error)

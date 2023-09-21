@@ -25,13 +25,14 @@ export const authOptions: NextAuthOptions = {
         if (!credentials || !credentials.username || !credentials.password) {
           throw new Error("Invalid credentials credentials");
         }
+        console.log('credentials', credentials)
         const { username, password } = credentials;
 
         await dbConnect();
         const user = await User.findOne({
           username,
         }); // Use the lean() method to return a plain JavaScript object
-
+          console.log('user', user)
         if (!user) {
           throw new Error("Invalid credentials user + ");
         }
@@ -39,6 +40,7 @@ export const authOptions: NextAuthOptions = {
         if (!match) {
           throw new Error("Invalid credentials match");
         }   
+        
         // console.log(user)     
         return user;
       },

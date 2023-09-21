@@ -41,7 +41,7 @@ const Login = () => {
     setLoading(true);   
     await signIn('credentials',{...data,redirect:false}).then((callback)=>{
         setLoading(false);
-        console.log(callback)
+        console.log('callback',callback);
         
         if(callback?.error){
           toast.error(callback.error);
