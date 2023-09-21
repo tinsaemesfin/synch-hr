@@ -66,19 +66,19 @@ const TenantSidebar = () => {
     {
       id: 5,
       name: "Allowance and Incentives",
-      href: "/companyAllowance",
+      href: "#",
       icon: InboxIcon,
     },
     { id: 6, name: "Reports", href: "#", icon: BarChart2Icon },
-    { id: 7, name: "Attendance", href: "/attendance", icon: CalendarIcon },
+    { id: 7, name: "Attendance", href: "#", icon: CalendarIcon },
     {
       id: 8,
       name: "Company Settings",
-      href: "/companySettings",
+      href: "#",
       icon: Settings2Icon,
     },
     { id: 9, name: "Leave", href: "/leave", icon: PaperclipIcon },
-    { id: 10, name: "Permission", href: "/permission", icon: HandIcon },
+    { id: 10, name: "Permission", href: "#", icon: HandIcon },
   ];
 
   const pathname = usePathname();
