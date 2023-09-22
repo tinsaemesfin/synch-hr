@@ -9,7 +9,7 @@ export default function Home() {
 
 
 if(status === 'loading') return <h1> Loading ... </h1>
-if(status === 'unauthenticated') redirect("/signin");
+if(status === 'unauthenticated') return redirect("/signin");
   return (
    <h1> DashBoard 
     Home Page {JSON.stringify(data)} {
