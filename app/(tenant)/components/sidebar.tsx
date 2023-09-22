@@ -19,28 +19,14 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/libs/utils";
-import { usePathname } from "next/navigation";
-import path from "path";
-import { zhCN } from "date-fns/locale";
+import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
 
 const TenantSidebar = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { data, status } = useSession();
-  const routes = [
-    {
-      label: "Dashboard",
-      // icon: CircleDashedIcon,
-      href: "/",
-      color: "text-sky-500",
-    },
-    {
-      label: "Conversation",
-      // icon: MessageSquare,
-      href: "/conversation",
-      color: "text-violet-500",
-    },
-  ];
+  const router = useRouter();
   const navigation = [
     { id: 1, name: "Dashboard", href: "/", icon: HomeIcon },
     { id: 2, name: "Employees", href: "/employee", icon: UsersIcon },
@@ -70,7 +56,7 @@ const TenantSidebar = () => {
       icon: InboxIcon,
     },
     { id: 6, name: "Reports", href: "#", icon: BarChart2Icon },
-    { id: 7, name: "Attendance", href: "#", icon: CalendarIcon },
+    { id: 7, name: "Attendance", href: "/attendance", icon: CalendarIcon },
     {
       id: 8,
       name: "Company Settings",
@@ -82,6 +68,9 @@ const TenantSidebar = () => {
   ];
 
   const pathname = usePathname();
+  const onClick = (href:string) => {
+    router.push(href);
+  };
 
   return (
     <>
@@ -254,32 +243,30 @@ const TenantSidebar = () => {
                         key={"panel" + index}
                       >
                         {item.children.map((subItem, index2) => (
-                          <Link
-                            href={subItem.href}
-                            key={subItem.href + "link" + index2}
-                          >
+                         
                             <Disclosure.Button
+                            onClick={()=>onClick(subItem.href)}
                               key={subItem.name}
                               as="p"
                               className="group w-full flex items-center pl-11 pr-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-gray-900 hover:bg-gray-50"
                             >
                               {subItem.name}
                             </Disclosure.Button>
-                          </Link>
+                         
                         ))}
                       </Disclosure.Panel>
                     </>
                   )}
                 </Disclosure>
               ) : (
-                <Link
+                <Button
                   key={index + "link"}
-                  href={item.href}
+                  onClick={()=>onClick(item.href)}
                   className={cn(
                     "group flex items-center px-2 py-2 text-sm font-medium rounded-md",
                     item.href === pathname
-                      ? "bg-gray-100 text-gray-900"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      ?  "text-gray-600 hover:bg-gray-50 hover:text-gray-900 bg-gray-200"
+                      : "bg-gray-50 text-gray-900 hover:bg-gray-200"
                   )}
                 >
                   <item.icon
@@ -292,7 +279,7 @@ const TenantSidebar = () => {
                     aria-hidden="true"
                   />
                   {item.name}
-                </Link>
+                </Button>
               )
             )}
           </nav>

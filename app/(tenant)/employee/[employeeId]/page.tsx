@@ -21,15 +21,16 @@ const Page = async ({ params }: { params: { employeeId: string } }) => {
   let employee: IEmployee | null = null;
   let token :string|undefined='kjiuyugyugyugygyuhugiu' ;
   const cookieStore =  cookies()
-  const rawToken = cookieStore.get('__Secure-next-auth.session-token')
+  // const rawToken = cookieStore.get('__Secure-next-auth.session-token');
+  const rawToken = cookieStore.get('next-auth.session-token');
+  
   token = rawToken?.value
   if(!token) return null
 
 
   
   try {
-    await dbConnect();
-   
+    await dbConnect();  
 
     // FIXME :  JUST FOR MAKING EASY FOR CHECKING
     const employeeResponse : AxiosResponse = await axios.get(`${process.env.BASE_URL}/api/employee/${params.employeeId}`,{

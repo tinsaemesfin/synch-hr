@@ -164,7 +164,7 @@ const AttendaceList = (
                 inPenalty?.penaltyTimeNumber > 0 && (
                   <>
                     {/* {totalPenality.lateIn += inPenalty?.penaltyTimeNumber} */}
-                    <span className="text-red-700 shadow-sm bg-slate-400">
+                    <span className="text-red-700 shadow-sm bg-slate-100">
                       Late {inPenalty?.penaltyTimeText} <br />-
                       {PenaltyMoneyCalculator(
                         activeContract.grossSalary.$numberDecimal,
@@ -186,7 +186,7 @@ const AttendaceList = (
                 outPenalty?.penaltyTimeNumber > 0 && (
                   <>
                     {/* {(totalPenality.earlyOut += outPenalty?.penaltyTimeNumber)} */}
-                    <span className="text-red-700 shadow-sm bg-slate-400">
+                    <span className="text-red-700 shadow-sm bg-slate-100">
                       Early {outPenalty?.penaltyTimeText} <br />-
                       {PenaltyMoneyCalculator(
                         activeContract.grossSalary.$numberDecimal,
@@ -256,7 +256,7 @@ const AttendaceList = (
 
     if (!(loopDate <= date?.to)) {
       body.push(
-        <TableCell key={index} className="text-black">
+        <TableCell key={index} className="text-black whitespace-nowrap">
           {totalPenality?.absent > 0 && (
             <>
               <span className="text-red-700">

@@ -6,7 +6,7 @@ import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
 import { Plus, UploadCloud } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { Suspense } from "react";
 import { EmployeeColumn, columns } from "./column";
 interface EmployeeClientProps {
     data :EmployeeColumn[]
@@ -36,7 +36,9 @@ const EmployeeClient:React.FC<EmployeeClientProps> = ({
         
       </div>
       <Separator />
+      <Suspense fallback={<div>loading.....................</div>}>
       <DataTable searchKey="fullName" columns={columns} data={data}  />
+      </Suspense>
       
     </>
   );
