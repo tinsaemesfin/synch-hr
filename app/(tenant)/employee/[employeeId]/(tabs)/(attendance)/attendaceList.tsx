@@ -4,8 +4,18 @@ import React, { ReactComponentElement } from "react";
 import { IattendaceEmployee } from "./attendance";
 import { IWorkingHour } from "@/types/workingHour";
 import { DateRange } from "react-day-picker";
-import { compareTimes } from "./AttendaceAlgortism";
+import {
+  OtMoneyCalculator,
+  PenaltyMoneyCalculator,
+  calculateAttendance,
+  compareTimes,
+  getMinMaxDates,
+  isSameMonthYear,
+  minTwoDigits,
+} from "./AttendaceAlgortism";
 import { IContract } from "@/types/contract";
+import NotWorkingDay from "./_componets/NotWorkingDay";
+import Absent from "./_componets/Absent";
 
 const AttendaceList = (
   date: DateRange,
@@ -37,17 +47,9 @@ const AttendaceList = (
     return null;
   }
 
-  const penaltyTotal = new Map<
-    Date,
-    {
-      lateIn: number | null;
-      earlyOut: number | null;
-      absent: number | null;
-      missedPunch: number;
-    }
-  >();
-
   const totalPenality = { lateIn: 0, earlyOut: 0, absent: 0, missedPunch: 0 };
+  const totalOt = { inOt: 0, outOt: 0, fullDayOt: 0 };
+  // console.log(loopDate, date?.to)
 
   while (loopDate <= date?.to) {
     const dateNum = loopDate.getDate();
@@ -56,12 +58,22 @@ const AttendaceList = (
       .toLowerCase();
     const dayNameIn = dayName + "In";
     const dayNameOut = dayName + "Out";
+    let foundMonthYear= false
+    // console.log(attendance)
 
     // loop through the given date range from the date picker
     attendance.forEach((attendance) => {
+      // console.log(attendance.timeSheet)
+
       // loop through the attendance date saved in DB
       const todaysAttendanceTimes = attendance.timeSheet[dateNum] ?? [];
       if (isSameMonthYear(new Date(attendance.monthYear), loopDate)) {
+        foundMonthYear = true
+        /*
+         *
+         *  The loop Date and the Attendance Details have the same month and year
+         *
+         */
         if (
           !(
             workingDayHour &&
@@ -69,11 +81,70 @@ const AttendaceList = (
               workingDayHour[dayNameOut as keyof typeof workingDayHour])
           )
         ) {
+          /*
+           *
+           *  The loop Date is On the weekend or not in working day for the employee
+           *
+           */
+          if(todaysAttendanceTimes.length ===1)
+          {
+            body.push(
+              <TableCell key={index}>
+                <span className="text-blue-600">
+                  {new Date(new Date(todaysAttendanceTimes[0]).getTime()-(180*60000)).toDateString()}{" "}
+                </span>{" "}
+                <br />
+                <span className="text-red-700">Ot-Missed</span>                
+              </TableCell>
+            );
+
+          }
+          else if(todaysAttendanceTimes.length > 1)
+          {
+          const { minDate, maxDate } = getMinMaxDates(todaysAttendanceTimes);
+          const isWeekend = minDate.getDay() === 0 || minDate.getDay() === 6;
+          const diffInMinutes = Math.floor((maxDate.getTime() - minDate.getTime()) / (1000 * 60));
+const diffInHours = Math.floor(diffInMinutes / 60);
+const remainingMinutes = diffInMinutes % 60;
+const OtText = `${diffInHours} hours and ${ remainingMinutes<10 ? '0'+remainingMinutes :remainingMinutes} minutes`;
+const OtNumber = diffInHours+Number((remainingMinutes/60).toFixed(2));
+const OtMoney = OtMoneyCalculator(activeContract.grossSalary.$numberDecimal,OtNumber,isWeekend);
+totalOt.fullDayOt += OtNumber;
+
           body.push(
-            <TableCell key={index} className="text-red-800">
-              -------
+            <TableCell key={index}>
+              <span className="text-blue-600">
+                In - {minDate.getHours()}
+                {":"}
+                {minTwoDigits(minDate.getMinutes())}
+              </span>{" "}
+              <br />              
+              <br />              
+              
+              <span className="text-blue-600 ">
+                Out - {maxDate.getHours()}
+                {":"}
+                {minTwoDigits(maxDate.getMinutes())}
+              </span>{" "}
+              <br />
+
+              <span className="text-blue-600 ">
+                OT - {OtText}
+              </span>{" "}
+              <br />
+              <span className="text-blue-600 ">
+                {OtMoney}{" "}Birr
+              </span>{" "}
+              <br />
+              
+              
             </TableCell>
           );
+
+          }
+          else{
+            body.push(<NotWorkingDay index={index} />);
+          }
         } else if (todaysAttendanceTimes.length < 1) {
           let absentTime = 0;
           if (
@@ -82,34 +153,25 @@ const AttendaceList = (
             workingDayHour[dayNameOut as keyof typeof workingDayHour] !==
               undefined
           ) {
-            // @ts-ignore
+            // @ts-ignore @prettier-ignore
             absentTime = compareTimes(workingDayHour[dayNameIn as keyof typeof workingDayHour],
               workingDayHour[dayNameOut as keyof typeof workingDayHour]
             );
             absentTime = absentTime > 8 ? 8 : absentTime;
             totalPenality.absent += absentTime;
-          }
+            let penaltyMoney = PenaltyMoneyCalculator(
+              activeContract.grossSalary.$numberDecimal,
+              absentTime
+            );
 
-          body.push(
-            <TableCell key={index}>
-              <span className="text-red-800">Absent</span> <br />
-              <span className="text-red-700">
-                {" "}
-                -
-                {PenaltyMoneyCalculator(
-                  activeContract.grossSalary.$numberDecimal,
-                  absentTime
-                )}{" "}
-                Birr
-              </span>{" "}
-            </TableCell>
-          );
+            body.push(<Absent index={index} penaltyMoney={penaltyMoney} />);
+          }
         } else if (todaysAttendanceTimes.length === 1) {
           totalPenality.missedPunch += 1;
           body.push(
             <TableCell key={index}>
               <span className="text-blue-600">
-                {todaysAttendanceTimes[0].toDateString()}{" "}
+                {new Date(todaysAttendanceTimes[0]).toDateString()}{" "}
               </span>{" "}
               <br />
               <span className="text-red-700">miss</span>
@@ -126,6 +188,7 @@ const AttendaceList = (
           );
         } else if (todaysAttendanceTimes.length > 1) {
           const { minDate, maxDate } = getMinMaxDates(todaysAttendanceTimes);
+          const isWeekend = minDate.getDay() === 0 || minDate.getDay() === 6;
           const inPenalty = calculateAttendance(
             workingDayHour[dayNameIn as keyof typeof workingDayHour],
             minDate,
@@ -136,22 +199,44 @@ const AttendaceList = (
             maxDate,
             false
           );
+          const inOt = inPenalty?.penaltyTimeNumber && inPenalty?.penaltyTimeNumber > 0 ? {penaltyTimeNumber:0,penaltyTimeText:'00:00'}: calculateAttendance(
+            workingDayHour[dayNameIn as keyof typeof workingDayHour],
+            minDate,
+            true,
+            true
+          );
+          const outOt = outPenalty?.penaltyTimeNumber && outPenalty?.penaltyTimeNumber >0 ? {penaltyTimeNumber:0,penaltyTimeText:'00:00'} : calculateAttendance(
+            workingDayHour[dayNameOut as keyof typeof workingDayHour],
+            maxDate,
+            false,
+            true
+          );
           inPenalty?.penaltyTimeNumber &&
-                inPenalty?.penaltyTimeText &&
-                inPenalty?.penaltyTimeNumber > 0 && (totalPenality.lateIn += inPenalty?.penaltyTimeNumber)
+            inPenalty?.penaltyTimeText &&
+            inPenalty?.penaltyTimeNumber > 0 &&
+            (totalPenality.lateIn += inPenalty?.penaltyTimeNumber);
           outPenalty?.penaltyTimeNumber &&
-                outPenalty?.penaltyTimeText &&
-                outPenalty?.penaltyTimeNumber > 0 && (totalPenality.earlyOut += outPenalty?.penaltyTimeNumber)
+            outPenalty?.penaltyTimeText &&
+            outPenalty?.penaltyTimeNumber > 0 &&
+            (totalPenality.earlyOut += outPenalty?.penaltyTimeNumber);
+
+          inOt?.penaltyTimeNumber &&
+            inOt?.penaltyTimeText &&
+            inOt?.penaltyTimeNumber > 0 &&
+            (totalOt.inOt += inOt?.penaltyTimeNumber);
+          outOt?.penaltyTimeNumber &&
+            outOt?.penaltyTimeText &&
+            outOt?.penaltyTimeNumber > 0 &&
+            (totalOt.outOt += outOt?.penaltyTimeNumber);
+
           /**
            * 
            * Below is the REnder boady and the above is the data
 
 
            */
-          
-          
-          
-                body.push(
+
+          body.push(
             <TableCell key={index}>
               <span className="text-blue-600">
                 In - {minDate.getHours()}
@@ -172,9 +257,26 @@ const AttendaceList = (
                       )}{" "}
                       Birr
                     </span>
+                    <br />
                   </>
                 )}
-              <br />
+              {inOt?.penaltyTimeNumber &&
+                inOt?.penaltyTimeText &&
+                inOt?.penaltyTimeNumber > 0 && (
+                  <>
+                    <span className="text-green-800 shadow-sm bg-slate-100">
+                      OT {inOt?.penaltyTimeText} <br />-
+                      {OtMoneyCalculator(
+                        activeContract.grossSalary.$numberDecimal,
+                        inOt?.penaltyTimeNumber,
+                        isWeekend
+                      )}{" "}
+                      Birr
+                    </span>
+                    <br />
+                  </>
+                )}
+                <br />
               <span className="text-blue-600 ">
                 Out - {maxDate.getHours()}
                 {":"}
@@ -196,6 +298,21 @@ const AttendaceList = (
                     </span>
                   </>
                 )}
+              {outOt?.penaltyTimeNumber &&
+                outOt?.penaltyTimeText &&
+                outOt?.penaltyTimeNumber > 0 && (
+                  <>
+                    <span className="text-green-800 shadow-sm bg-slate-100">
+                      OT {outOt?.penaltyTimeText} <br />-
+                      {OtMoneyCalculator(
+                        activeContract.grossSalary.$numberDecimal,
+                        outOt?.penaltyTimeNumber,
+                        isWeekend
+                      )}{" "}
+                      Birr
+                    </span>
+                  </>
+                )}
             </TableCell>
           );
         } else {
@@ -205,7 +322,12 @@ const AttendaceList = (
             </TableCell>
           );
         }
-      } else {
+      } 
+      
+    });
+    if(!foundMonthYear)
+    {
+      
         if (
           !(
             workingDayHour &&
@@ -213,11 +335,7 @@ const AttendaceList = (
               workingDayHour[dayNameOut as keyof typeof workingDayHour])
           )
         ) {
-          body.push(
-            <TableCell key={index} className="text-red-800">
-              -------
-            </TableCell>
-          );
+          body.push(<NotWorkingDay index={index} />);
         } else {
           let absentTime = 0;
           if (
@@ -248,8 +366,8 @@ const AttendaceList = (
             </TableCell>
           );
         }
-      }
-    });
+      
+    }
 
     loopDate.setDate(loopDate.getDate() + 1);
     index = index + 1;
@@ -260,8 +378,7 @@ const AttendaceList = (
           {totalPenality?.absent > 0 && (
             <>
               <span className="text-red-700">
-                {"Absent  "}
-                -
+                {"Absent  "}-
                 {PenaltyMoneyCalculator(
                   activeContract.grossSalary.$numberDecimal,
                   totalPenality?.absent
@@ -272,11 +389,10 @@ const AttendaceList = (
             </>
           )}
 
-{totalPenality?.missedPunch > 0 && (
+          {totalPenality?.missedPunch > 0 && (
             <>
               <span className="text-red-700">
-                {"Missed Punch  "}
-                -
+                {"Missed Punch  "}-
                 {PenaltyMoneyCalculator(
                   activeContract.grossSalary.$numberDecimal,
                   totalPenality?.missedPunch
@@ -287,11 +403,10 @@ const AttendaceList = (
             </>
           )}
 
-{totalPenality?.lateIn > 0 && (
+          {totalPenality?.lateIn > 0 && (
             <>
               <span className="text-red-700">
-                {"Late In  "}
-                -
+                {"Late In  "}-
                 {PenaltyMoneyCalculator(
                   activeContract.grossSalary.$numberDecimal,
                   totalPenality?.lateIn
@@ -302,11 +417,10 @@ const AttendaceList = (
             </>
           )}
 
-{totalPenality?.earlyOut > 0 && (
+          {totalPenality?.earlyOut > 0 && (
             <>
               <span className="text-red-700">
-                {"Early Out  "}
-                -
+                {"Early Out  "}-
                 {PenaltyMoneyCalculator(
                   activeContract.grossSalary.$numberDecimal,
                   totalPenality?.earlyOut
@@ -316,6 +430,24 @@ const AttendaceList = (
               <br />
             </>
           )}
+
+          {totalOt?.fullDayOt > 0 && (
+            <>
+              <span className="text-green-800">
+                {"Full Day OT  "}-
+                {OtMoneyCalculator(
+                  activeContract.grossSalary.$numberDecimal,
+                  totalOt?.fullDayOt,
+                  true
+                )}{" "}
+                Birr
+              </span>{" "}
+              <br />
+            </>
+          )}
+
+
+          
         </TableCell>
       );
     }
@@ -323,77 +455,6 @@ const AttendaceList = (
   return body;
 };
 
-function isSameMonthYear(date1: Date, date2: Date): boolean {
-  return (
-    date1.getFullYear() === date2.getFullYear() &&
-    date1.getMonth() === date2.getMonth()
-  );
-}
-function getMinMaxDates(dates: Date[]): { minDate: Date; maxDate: Date } {
-  const sortedDates = dates.sort(
-    (a, b) => new Date(a).getTime() - new Date(b).getTime()
-  );
-  const minDate = new Date(sortedDates[0]);
-  const maxDate = new Date(sortedDates[sortedDates.length - 1]);
-  return { minDate, maxDate };
-}
-function calculateAttendance(
-  time: string | undefined,
-  date: Date,
-  isIn: boolean
-): { penaltyTimeNumber: number; penaltyTimeText: string } | null {
-  if (!time) {
-    return null;
-  }
-
-  const [hour, minute] = time.split(":");
-  let workingHourWithT = new Date(date);
-  workingHourWithT.setHours(Number(hour), Number(minute), 0, 0);
-  const workingHour = workingHourWithT.getTime();
-  const attendanceTime = new Date(date).getTime();
-  let diff = 0;
-  let diffInHours= 0;
-  let diffInMinutes = 0;
-  if (isIn) {
-    diff = (workingHour - (attendanceTime-600000));
-    // 10 minite buffer Zone
-    if (diff > 0) {
-      return null;
-    }
-    const minutesLate = Math.abs(diff / 60000);
-   diffInHours = Math.floor(minutesLate / 60);
-   diffInMinutes = Math.floor(minutesLate % 60);
-  } else {
-    diff = attendanceTime - workingHour;
-    if (diff > 0) {
-      return null;
-    }
-    const minutesLate = Math.abs(diff / 60000);
-  diffInHours = Math.floor(minutesLate / 60);
-  diffInMinutes = Math.ceil(minutesLate % 60);
-  }
-  
-
-  
-
-  //  return  like 1.5 hour mean 1 hour 30 minutes only in  two decimal points mean not 1.556 but like 1.55
-
-  let penaltyTimeNumber =
-    Number(diffInHours) + Number((diffInMinutes / 60).toFixed(2));
-  let penaltyTimeText = `${diffInHours
-    .toString()
-    .padStart(2, "0")}:${diffInMinutes.toString().padStart(2, "0")}`;
-
-  return { penaltyTimeNumber, penaltyTimeText };
-}
-
-function PenaltyMoneyCalculator(grossSalary: number, hours: number) {
-  return Number(((grossSalary / 192) * hours).toFixed(2));
-}
-
-export const minTwoDigits = (n:number) => {
-  return (n < 10 ? "0" : "") + n;
-};
 
 //   const fromDate = new Date('2019-01-01');
 // const toDate = new Date('2019-01-31');

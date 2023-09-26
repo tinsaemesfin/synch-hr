@@ -52,10 +52,10 @@ const TenantSidebar = () => {
     {
       id: 5,
       name: "Allowance and Incentives",
-      href: "#",
+      href: "/",
       icon: InboxIcon,
     },
-    { id: 6, name: "Reports", href: "#", icon: BarChart2Icon },
+    { id: 6, name: "Reports", href: "/reports", icon: BarChart2Icon },
     { id: 7, name: "Attendance", href: "/attendance", icon: CalendarIcon },
     {
       id: 8,
