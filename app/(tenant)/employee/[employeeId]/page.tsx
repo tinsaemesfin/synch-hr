@@ -15,14 +15,15 @@ import { WorkingHour } from "./(tabs)/(workingHour)/workingHour";
 import { Overtime } from "./(tabs)/(overtime)/overtime";
 import { Allowance } from "./(tabs)/(allowance)/allowance";
 import Attendance from "./(tabs)/(attendance)/attendance";
+import Table from "./(tabs)/(attendance)/test";
 
 
 const Page = async ({ params }: { params: { employeeId: string } }) => {
   let employee: IEmployee | null = null;
   let token :string|undefined='kjiuyugyugyugygyuhugiu' ;
   const cookieStore =  cookies()
-  const rawToken = cookieStore.get('__Secure-next-auth.session-token');
-  // const rawToken = cookieStore.get('next-auth.session-token');
+  // const rawToken = cookieStore.get('__Secure-next-auth.session-token');
+  const rawToken = cookieStore.get('next-auth.session-token');
   
   token = rawToken?.value
   if(!token) return null
@@ -77,7 +78,7 @@ const Page = async ({ params }: { params: { employeeId: string } }) => {
            </TabsContent>
         <TabsContent value="overtime"> <Overtime employee={employee} token={token} /> </TabsContent>
         <TabsContent value="allowance"><Allowance employee={employee} token={token} /> </TabsContent>
-        <TabsContent value="otForm">OtForm.</TabsContent>
+        <TabsContent value="otForm">OtForm.<Table /></TabsContent>
         <TabsContent value="attendance"><Attendance employee={employee} token={token} /></TabsContent>
         <TabsContent value="leaveAndPermission">
           Leave and Permission

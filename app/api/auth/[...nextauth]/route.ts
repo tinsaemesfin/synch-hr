@@ -63,8 +63,7 @@ export const authOptions: NextAuthOptions = {
           username: user.username,
           role: user.role,
           email: user.email,
-          tenantId: user.tenantId,
-          
+          tenantId: user.tenantId,          
           
         }
       }

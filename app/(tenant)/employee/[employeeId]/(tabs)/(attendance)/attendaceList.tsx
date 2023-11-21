@@ -89,7 +89,7 @@ const AttendaceList = (
           if(todaysAttendanceTimes.length ===1)
           {
             body.push(
-              <TableCell key={index}>
+              <TableCell key={index} className="whitespace-nowrap">
                 <span className="text-blue-600">
                   {new Date(new Date(todaysAttendanceTimes[0]).getTime()-(180*60000)).toDateString()}{" "}
                 </span>{" "}
@@ -112,7 +112,7 @@ const OtMoney = OtMoneyCalculator(activeContract.grossSalary.$numberDecimal,OtNu
 totalOt.fullDayOt += OtNumber;
 
           body.push(
-            <TableCell key={index}>
+            <TableCell key={index} className="whitespace-nowrap">
               <span className="text-blue-600">
                 In - {minDate.getHours()}
                 {":"}
@@ -169,7 +169,7 @@ totalOt.fullDayOt += OtNumber;
         } else if (todaysAttendanceTimes.length === 1) {
           totalPenality.missedPunch += 1;
           body.push(
-            <TableCell key={index}>
+            <TableCell key={index} className="whitespace-nowrap">
               <span className="text-blue-600">
                 {new Date(todaysAttendanceTimes[0]).toDateString()}{" "}
               </span>{" "}
@@ -237,7 +237,7 @@ totalOt.fullDayOt += OtNumber;
            */
 
           body.push(
-            <TableCell key={index}>
+            <TableCell key={index} className="whitespace-nowrap">
               <span className="text-blue-600">
                 In - {minDate.getHours()}
                 {":"}
@@ -317,7 +317,7 @@ totalOt.fullDayOt += OtNumber;
           );
         } else {
           body.push(
-            <TableCell key={index} className="text-red-800">
+            <TableCell key={index} className="text-red-800 whitespace-nowrap">
               This Can not be reached{" "}
             </TableCell>
           );
@@ -352,7 +352,7 @@ totalOt.fullDayOt += OtNumber;
             totalPenality.absent += absentTime;
           }
           body.push(
-            <TableCell key={index} className="text-red-800">
+            <TableCell key={index} className="text-red-800 whitespace-nowrap">
               <span>Absent </span> <br />
               <span className="text-red-700">
                 {" "}

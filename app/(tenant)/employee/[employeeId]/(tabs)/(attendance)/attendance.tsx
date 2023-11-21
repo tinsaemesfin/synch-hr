@@ -22,6 +22,8 @@ import { CldUploadWidget } from "next-cloudinary";
 import React, { useEffect } from "react";
 import { DateRange } from "react-day-picker";
 import AttendaceList from "./attendaceList";
+import jsPDF from "jspdf";
+import autoTable, { CellWidthType, OverflowType, Styles } from "jspdf-autotable";
 interface IProps {
   employee: IEmployee;
   token: string;
@@ -29,8 +31,8 @@ interface IProps {
 export interface IattendaceEmployee {
   employee: IEmployee;
   attendance: IAttendanceDetails[] | [];
-  permissionResponse:IPermission[]|[];
-  employeeLeaveResponse:IEmployeeLeave[]|[]
+  permissionResponse: IPermission[] | [];
+  employeeLeaveResponse: IEmployeeLeave[] | [];
 }
 
 const Attendance: React.FC<IProps> = ({ employee, token }) => {
@@ -40,7 +42,7 @@ const Attendance: React.FC<IProps> = ({ employee, token }) => {
   });
   const [withPenality, setWithPenality] = React.useState<boolean>(false);
   const [attendance, setAttendance] = React.useState<
-  IattendaceEmployee | undefined
+    IattendaceEmployee | undefined
   >();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [ReadyData, setReadyData] = React.useState();
@@ -63,7 +65,7 @@ const Attendance: React.FC<IProps> = ({ employee, token }) => {
               }
             );
             setLoading(false);
-            
+
             attendaceResponse.status === 200 &&
               setAttendance(attendaceResponse.data);
           };
@@ -76,30 +78,86 @@ const Attendance: React.FC<IProps> = ({ employee, token }) => {
         }
       }
     })();
-    // 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    //
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date, withPenality, employee._id, token]); // added missing dependencies
 
-useEffect(()=>{
+  useEffect(() => {}, [attendance]);
 
-},[attendance])
+  const downloadPdf = () => {
+    const unit = "pt";
+    const size = "A4"; // Use A1, A2, A3 or A4
+    const orientation = "landscape"; // portrait or landscape
 
-  const renderTableHeader = () => {
-    let headers = [];
+    const marginLeft = 40;
+
+    const doc = new jsPDF(orientation, unit, size);
+    doc.setFontSize(15);
+    const title = "Employee Attendance";
+    const pdfHeaders: number[] = [1, 2];
+    const pdfBody: string[] = [];
+    for (let i = 3; i < 33; i++) {
+      pdfHeaders.push(i);
+    }
+    for (let i = 0; i < 30; i++) {
+      let temp: string = i + " Date";
+      pdfBody.push(temp);
+    }
+
+    const pdfData = attendance?.attendance;
+    let content = {
+      startY: 50,
+      head: [pdfHeaders],
+      body: [pdfBody],
+    };
+    doc.text(title, marginLeft, 100);
+    let attendaceLength = 50;
+    const columnStyles:Record<number, { cellWidth: CellWidthType, overflow :OverflowType}> = {};
+    console.log(attendaceLength)
+    for (let i = 0; i < attendaceLength; i++) {
+      columnStyles[i] = { cellWidth: "wrap", overflow:'linebreak'  };
+    }
+  
+
+    // autoTable(doc, content);
+    console.log(columnStyles)
+    autoTable(doc, { html: "#attendanceTable", columnStyles:{...columnStyles},rowPageBreak:'auto',styles:{overflow:'linebreak', minCellHeight:40, minCellWidth:90,}});
+
+    doc.save("attendaceReport.pdf");
+
+    console.log("download pdf");
+  };
+
+  const renderTableHeader = (isForDownload = false) => {
     if (!date?.from || !date?.to) return null;
+
+    if (isForDownload) {
+      let headers = [];
+      let loopDate = new Date(date?.from);
+      let index = 0;
+      while (loopDate <= date?.to) {
+        headers.push(loopDate.toDateString());
+        loopDate.setDate(loopDate.getDate() + 1);
+        ++index;
+      }
+      
+      return headers;
+    }
+
+    let headers = [];
     let loopDate = new Date(date?.from);
     let index = 0;
     while (loopDate <= date?.to) {
       headers.push(
-        <TableHead key={index}>{loopDate.toDateString()}</TableHead>
+        <TableHead key={index} className="whitespace-nowrap">{loopDate.toDateString()}</TableHead>
       );
       loopDate.setDate(loopDate.getDate() + 1);
       ++index;
     }
+    headers.push(<TableHead key={index+1} className="whitespace-nowrap">{'Total '}</TableHead>)
     return headers;
   };
-  if(loading)
-  return <LoadingModel />
+  if (loading) return <LoadingModel />;
 
   return (
     <div className="flow-root">
@@ -114,33 +172,53 @@ useEffect(()=>{
             checked={withPenality}
             onChange={() => setWithPenality(!withPenality)}
           />
+          <Button
+            disabled={
+              attendance &&
+              attendance?.attendance?.length > 0 &&
+              date &&
+              date.from &&
+              date.to
+                ? false
+                : true
+            }
+            onClick={downloadPdf}
+          >
+            {" "}
+            Download Pdf{" "}
+          </Button>
           <div className="flex items-center">
             <DatePickerWithRange date={date} setDate={setDate} />
           </div>
         </header>
-        {attendance && date && date.from && date.to && attendance?.attendance?.length < 0 && (
-              <h1>Could not found attendance Details</h1>
-            )}
+        {attendance &&
+          date &&
+          date.from &&
+          date.to &&
+          attendance?.attendance?.length < 0 && (
+            <h1>Could not found attendance Details</h1>
+          )}
 
-        {attendance && attendance?.attendance?.length > 0 &&  date && date.from && date.to && (
-          <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-            
-            <Table>
-              <TableCaption>
-                Employee Attendance from {date?.from?.toDateString()} to{" "}
-                {date?.to?.toDateString()}
-              </TableCaption>
-              <TableHeader>
-                <TableRow>{renderTableHeader()}</TableRow>
-              </TableHeader>
-              <TableBody>
-    <TableRow>
-      {AttendaceList(date,attendance)}
-    </TableRow>
-  </TableBody>
-            </Table>
-          </div>
-        )}
+        {attendance &&
+          attendance?.attendance?.length > 0 &&
+          date &&
+          date.from &&
+          date.to && (
+            <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+              <Table id="attendanceTable" className="table-auto">
+                <TableCaption>
+                  Employee Attendance from {date?.from?.toDateString()} to{" "}
+                  {date?.to?.toDateString()}
+                </TableCaption>
+                <TableHeader>
+                  <TableRow>{renderTableHeader()}</TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>{AttendaceList(date, attendance)}</TableRow>
+                </TableBody>
+              </Table>
+            </div>
+          )}
       </div>
     </div>
   );

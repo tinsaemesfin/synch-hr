@@ -11,6 +11,7 @@ export default async function middleware(req: NextRequest) {
     req,
   });
   const requestHeaders = new Headers(req.headers);
+  console.log('session => ', session)
 
   if (
     !session &&
