@@ -78,7 +78,7 @@ const Page = async ({ params }: { params: { employeeId: string } }) => {
            </TabsContent>
         <TabsContent value="overtime"> <Overtime employee={employee} token={token} /> </TabsContent>
         <TabsContent value="allowance"><Allowance employee={employee} token={token} /> </TabsContent>
-        <TabsContent value="otForm">OtForm.<Table /></TabsContent>
+        <TabsContent value="otForm">OtForm.</TabsContent>
         <TabsContent value="attendance"><Attendance employee={employee} token={token} /></TabsContent>
         <TabsContent value="leaveAndPermission">
           Leave and Permission

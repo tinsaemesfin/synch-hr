@@ -19,11 +19,16 @@ import { IEmployeeLeave } from "@/types/employeeLeave";
 import { IPermission } from "@/types/permission";
 import axios, { AxiosResponse } from "axios";
 import { CldUploadWidget } from "next-cloudinary";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { DateRange } from "react-day-picker";
 import AttendaceList from "./attendaceList";
+import ReactToPrint from "react-to-print";
 import jsPDF from "jspdf";
-import autoTable, { CellWidthType, OverflowType, Styles } from "jspdf-autotable";
+import autoTable, {
+  CellWidthType,
+  OverflowType,
+  Styles,
+} from "jspdf-autotable";
 interface IProps {
   employee: IEmployee;
   token: string;
@@ -46,6 +51,10 @@ const Attendance: React.FC<IProps> = ({ employee, token }) => {
   >();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [ReadyData, setReadyData] = React.useState();
+  const [MyReactNode, setMyReactNode] = React.useState<
+    React.ReactNode[] | null
+  >(null);
+  const pdfRef = useRef(null);
 
   useEffect(() => {
     (async () => {
@@ -82,81 +91,12 @@ const Attendance: React.FC<IProps> = ({ employee, token }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date, withPenality, employee._id, token]); // added missing dependencies
 
-  useEffect(() => {}, [attendance]);
-
-  const downloadPdf = () => {
-    const unit = "pt";
-    const size = "A4"; // Use A1, A2, A3 or A4
-    const orientation = "landscape"; // portrait or landscape
-
-    const marginLeft = 40;
-
-    const doc = new jsPDF(orientation, unit, size);
-    doc.setFontSize(15);
-    const title = "Employee Attendance";
-    const pdfHeaders: number[] = [1, 2];
-    const pdfBody: string[] = [];
-    for (let i = 3; i < 33; i++) {
-      pdfHeaders.push(i);
+  useEffect(() => {
+    if (attendance && date && date.from && date.to) {
+      setMyReactNode(AttendaceList(date, attendance));
     }
-    for (let i = 0; i < 30; i++) {
-      let temp: string = i + " Date";
-      pdfBody.push(temp);
-    }
+  }, [attendance, date]);
 
-    const pdfData = attendance?.attendance;
-    let content = {
-      startY: 50,
-      head: [pdfHeaders],
-      body: [pdfBody],
-    };
-    doc.text(title, marginLeft, 100);
-    let attendaceLength = 50;
-    const columnStyles:Record<number, { cellWidth: CellWidthType, overflow :OverflowType}> = {};
-    console.log(attendaceLength)
-    for (let i = 0; i < attendaceLength; i++) {
-      columnStyles[i] = { cellWidth: "wrap", overflow:'linebreak'  };
-    }
-  
-
-    // autoTable(doc, content);
-    console.log(columnStyles)
-    autoTable(doc, { html: "#attendanceTable", columnStyles:{...columnStyles},rowPageBreak:'auto',styles:{overflow:'linebreak', minCellHeight:40, minCellWidth:90,}});
-
-    doc.save("attendaceReport.pdf");
-
-    console.log("download pdf");
-  };
-
-  const renderTableHeader = (isForDownload = false) => {
-    if (!date?.from || !date?.to) return null;
-
-    if (isForDownload) {
-      let headers = [];
-      let loopDate = new Date(date?.from);
-      let index = 0;
-      while (loopDate <= date?.to) {
-        headers.push(loopDate.toDateString());
-        loopDate.setDate(loopDate.getDate() + 1);
-        ++index;
-      }
-      
-      return headers;
-    }
-
-    let headers = [];
-    let loopDate = new Date(date?.from);
-    let index = 0;
-    while (loopDate <= date?.to) {
-      headers.push(
-        <TableHead key={index} className="whitespace-nowrap">{loopDate.toDateString()}</TableHead>
-      );
-      loopDate.setDate(loopDate.getDate() + 1);
-      ++index;
-    }
-    headers.push(<TableHead key={index+1} className="whitespace-nowrap">{'Total '}</TableHead>)
-    return headers;
-  };
   if (loading) return <LoadingModel />;
 
   return (
@@ -172,21 +112,28 @@ const Attendance: React.FC<IProps> = ({ employee, token }) => {
             checked={withPenality}
             onChange={() => setWithPenality(!withPenality)}
           />
-          <Button
-            disabled={
-              attendance &&
-              attendance?.attendance?.length > 0 &&
-              date &&
-              date.from &&
-              date.to
-                ? false
-                : true
-            }
-            onClick={downloadPdf}
-          >
-            {" "}
-            Download Pdf{" "}
-          </Button>
+
+          <ReactToPrint
+            bodyClass="print-agreement"
+            content={() => pdfRef.current}
+            trigger={() => (
+              <Button
+                disabled={
+                  attendance &&
+                  attendance?.attendance?.length > 0 &&
+                  date &&
+                  date.from &&
+                  date.to
+                    ? false
+                    : true
+                }
+              >
+                {" "}
+                Download Pdf{" "}
+              </Button>
+            )}
+          />
+
           <div className="flex items-center">
             <DatePickerWithRange date={date} setDate={setDate} />
           </div>
@@ -199,26 +146,23 @@ const Attendance: React.FC<IProps> = ({ employee, token }) => {
             <h1>Could not found attendance Details</h1>
           )}
 
-        {attendance &&
-          attendance?.attendance?.length > 0 &&
-          date &&
-          date.from &&
-          date.to && (
-            <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-              <Table id="attendanceTable" className="table-auto">
-                <TableCaption>
-                  Employee Attendance from {date?.from?.toDateString()} to{" "}
-                  {date?.to?.toDateString()}
-                </TableCaption>
-                <TableHeader>
-                  <TableRow>{renderTableHeader()}</TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>{AttendaceList(date, attendance)}</TableRow>
-                </TableBody>
-              </Table>
-            </div>
-          )}
+        <div
+          ref={pdfRef}
+          id="ToSavePdf"
+          className="max-w-96 mx-auto  pt-10 pb-10 "
+        >
+          <h1 className="print:block hidden text-center">
+            {employee.fullName}
+          </h1>
+          <h1 className="print:block hidden text-center">{`From - ${date?.from?.toDateString()} To - ${date?.to?.toDateString()}`}</h1>
+          <div className="flex flex-wrap">
+            {MyReactNode === null ? (
+              <div>No Attendance Data Found</div>
+            ) : (
+              MyReactNode.map((node, index) => <>{node}</>)
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

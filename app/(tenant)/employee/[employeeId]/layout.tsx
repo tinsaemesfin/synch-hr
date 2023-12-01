@@ -17,6 +17,7 @@ const Layout = async ({
 }) => {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/signin");
+  
   await dbConnect();
   const employee = await Employee.findOne({
     _id: params.employeeId,

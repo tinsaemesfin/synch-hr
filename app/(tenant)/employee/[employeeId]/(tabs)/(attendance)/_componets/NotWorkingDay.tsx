@@ -1,14 +1,12 @@
 import { TableCell } from '@/components/ui/table'
 import React from 'react'
-interface props{
-    index:number
-}
 
-const NotWorkingDay:React.FC<props> = ({index}) => {
+
+const NotWorkingDay:React.FC = () => {
   return (
-    <TableCell key={index} className="text-red-800">
+    <div className=" px-4 py-2">
               -------
-            </TableCell>
+            </div>
   )
 }
 

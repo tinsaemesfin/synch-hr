@@ -1,6 +1,6 @@
 import { TableCell } from "@/components/ui/table";
 import { IAttendanceDetails } from "@/types/attendanceDetails";
-import React, { ReactComponentElement, ReactNode } from "react";
+import React, { ReactComponentElement } from "react";
 import { IattendaceEmployee } from "./attendance";
 import { IWorkingHour } from "@/types/workingHour";
 import { DateRange } from "react-day-picker";
@@ -16,51 +16,16 @@ import {
 import { IContract } from "@/types/contract";
 import NotWorkingDay from "./_componets/NotWorkingDay";
 import Absent from "./_componets/Absent";
-import Ad from "./test";
-import { Button } from "@/components/ui/button";
 
 const AttendaceList = (
   date: DateRange,
   employeeAttendance: IattendaceEmployee
-) : ReactNode[]|null => {
+) => {
   const { attendance, employee, employeeLeaveResponse, permissionResponse } =
     employeeAttendance;
-    type attDetType = {
-      attendances:Date[],
-      correctedAttendance?:Date[],
-      holiday:boolean,
-      weekend:boolean,
-      workingDay:boolean,
-      penalty?:{
-        lateIn?:number,
-        earlyOut?:number,
-        absent?:number,
-        missedPunch?:number
-      }
-      ot?:{
-        earlyOt?:{
-          before10Pm?:number,
-          after10Pm?:number,
-          weekend?:number,
-        },
-        lateOt?:{
-          before10Pm?:number,
-          after10Pm?:number,
-          weekend?:number,
-        },
-        fullDayOt?:{
-          before10Pm?:number,
-          after10Pm?:number,
-          weekend?:number,
-          holyday?:number,
-        },       
-      },      
-    }
-    type mapAttendanceType =Map<Date,attDetType>
-    const mapAttendance:mapAttendanceType = new Map();
   // attendaceEmployee
 
-  
+  let body: React.JSX.Element[] = [];
   if (!date?.from || !date?.to) return null;
   let loopDate = new Date(date?.from);
   let index = 0;
@@ -85,22 +50,15 @@ const AttendaceList = (
   const totalPenality = { lateIn: 0, earlyOut: 0, absent: 0, missedPunch: 0 };
   const totalOt = { inOt: 0, outOt: 0, fullDayOt: 0 };
   // console.log(loopDate, date?.to)
-  let AllDetails :ReactNode[]=[]
-  
+
   while (loopDate <= date?.to) {
-    const CopyDate = new Date(loopDate);
     const dateNum = loopDate.getDate();
     const dayName = loopDate
       .toLocaleString("en-us", { weekday: "long" })
       .toLowerCase();
     const dayNameIn = dayName + "In";
     const dayNameOut = dayName + "Out";
-    let foundMonthYear = false;
-    let Details:ReactNode;
-    const isWeekend = loopDate.getDay() === 0 || loopDate.getDay() === 6;
-    
-
-  
+    let foundMonthYear= false
     // console.log(attendance)
 
     // loop through the given date range from the date picker
@@ -110,7 +68,7 @@ const AttendaceList = (
       // loop through the attendance date saved in DB
       const todaysAttendanceTimes = attendance.timeSheet[dateNum] ?? [];
       if (isSameMonthYear(new Date(attendance.monthYear), loopDate)) {
-        foundMonthYear = true;
+        foundMonthYear = true
         /*
          *
          *  The loop Date and the Attendance Details have the same month and year
@@ -128,62 +86,64 @@ const AttendaceList = (
            *  The loop Date is On the weekend or not in working day for the employee
            *
            */
-          if (todaysAttendanceTimes.length === 1) {
-            mapAttendance.set(loopDate,{attendances:todaysAttendanceTimes,holiday:false,weekend:isWeekend,workingDay:false})
-            Details = (
-              <div className=" px-4 py-2" >
-                {" "}
+          if(todaysAttendanceTimes.length ===1)
+          {
+            body.push(
+              <TableCell key={index} className="whitespace-nowrap">
                 <span className="text-blue-600">
-                  {new Date(
-                    new Date(todaysAttendanceTimes[0]).getTime() - 180 * 60000
-                  ).toDateString()}{" "}
+                  {new Date(new Date(todaysAttendanceTimes[0]).getTime()-(180*60000)).toDateString()}{" "}
                 </span>{" "}
                 <br />
-                <span className="text-red-700">Ot-Missed</span>{" "}
-                
-              </div>
+                <span className="text-red-700">Ot-Missed</span>                
+              </TableCell>
             );
-          } else if (todaysAttendanceTimes.length > 1) {
-            const { minDate, maxDate } = getMinMaxDates(todaysAttendanceTimes);
-            
-            const diffInMinutes = Math.floor(
-              (maxDate.getTime() - minDate.getTime()) / (1000 * 60)
-            );
-            const diffInHours = Math.floor(diffInMinutes / 60);
-            const remainingMinutes = diffInMinutes % 60;
-            const OtText = `${diffInHours} hours and ${
-              remainingMinutes < 10 ? "0" + remainingMinutes : remainingMinutes
-            } minutes`;
-            const OtNumber =
-              diffInHours + Number((remainingMinutes / 60).toFixed(2));
-            const OtMoney = OtMoneyCalculator(
-              activeContract.grossSalary.$numberDecimal,
-              OtNumber,
-              isWeekend
-            );
-            totalOt.fullDayOt += OtNumber;
+
+          }
+          else if(todaysAttendanceTimes.length > 1)
+          {
+          const { minDate, maxDate } = getMinMaxDates(todaysAttendanceTimes);
+          const isWeekend = minDate.getDay() === 0 || minDate.getDay() === 6;
+          const diffInMinutes = Math.floor((maxDate.getTime() - minDate.getTime()) / (1000 * 60));
+const diffInHours = Math.floor(diffInMinutes / 60);
+const remainingMinutes = diffInMinutes % 60;
+const OtText = `${diffInHours} hours and ${ remainingMinutes<10 ? '0'+remainingMinutes :remainingMinutes} minutes`;
+const OtNumber = diffInHours+Number((remainingMinutes/60).toFixed(2));
+const OtMoney = OtMoneyCalculator(activeContract.grossSalary.$numberDecimal,OtNumber,isWeekend);
+totalOt.fullDayOt += OtNumber;
+
+          body.push(
+            <TableCell key={index} className="whitespace-nowrap">
+              <span className="text-blue-600">
+                In - {minDate.getHours()}
+                {":"}
+                {minTwoDigits(minDate.getMinutes())}
+              </span>{" "}
+              <br />              
+              <br />              
               
-            Details=(
-              <div className=" px-4 py-2">
-                <span className="text-blue-600">
-                  In - {minDate.getHours()}
-                  {":"}
-                  {minTwoDigits(minDate.getMinutes())}
-                </span>{" "}
-                <br />
-                <br />
-                <span className="text-blue-600 ">
-                  Out - {maxDate.getHours()}
-                  {":"}
-                  {minTwoDigits(maxDate.getMinutes())}
-                </span>{" "}
-                <br />
-                <span className="text-blue-600 ">OT - {OtText}</span> <br />
-                <span className="text-blue-600 ">{OtMoney} Birr</span> <br />
-              </div>
-            );
-          } else {
-            Details = (<NotWorkingDay />);
+              <span className="text-blue-600 ">
+                Out - {maxDate.getHours()}
+                {":"}
+                {minTwoDigits(maxDate.getMinutes())}
+              </span>{" "}
+              <br />
+
+              <span className="text-blue-600 ">
+                OT - {OtText}
+              </span>{" "}
+              <br />
+              <span className="text-blue-600 ">
+                {OtMoney}{" "}Birr
+              </span>{" "}
+              <br />
+              
+              
+            </TableCell>
+          );
+
+          }
+          else{
+            body.push(<NotWorkingDay index={index} />);
           }
         } else if (todaysAttendanceTimes.length < 1) {
           let absentTime = 0;
@@ -204,12 +164,12 @@ const AttendaceList = (
               absentTime
             );
 
-            Details = (<Absent  penaltyMoney={penaltyMoney} />);
+            body.push(<Absent index={index} penaltyMoney={penaltyMoney} />);
           }
         } else if (todaysAttendanceTimes.length === 1) {
           totalPenality.missedPunch += 1;
-         Details = (
-          <div className=" px-4 py-2">
+          body.push(
+            <TableCell key={index} className="whitespace-nowrap">
               <span className="text-blue-600">
                 {new Date(todaysAttendanceTimes[0]).toDateString()}{" "}
               </span>{" "}
@@ -224,7 +184,7 @@ const AttendaceList = (
                 )}{" "}
                 Birr
               </span>{" "}
-            </div>
+            </TableCell>
           );
         } else if (todaysAttendanceTimes.length > 1) {
           const { minDate, maxDate } = getMinMaxDates(todaysAttendanceTimes);
@@ -239,24 +199,18 @@ const AttendaceList = (
             maxDate,
             false
           );
-          const inOt =
-            inPenalty?.penaltyTimeNumber && inPenalty?.penaltyTimeNumber > 0
-              ? { penaltyTimeNumber: 0, penaltyTimeText: "00:00" }
-              : calculateAttendance(
-                  workingDayHour[dayNameIn as keyof typeof workingDayHour],
-                  minDate,
-                  true,
-                  true
-                );
-          const outOt =
-            outPenalty?.penaltyTimeNumber && outPenalty?.penaltyTimeNumber > 0
-              ? { penaltyTimeNumber: 0, penaltyTimeText: "00:00" }
-              : calculateAttendance(
-                  workingDayHour[dayNameOut as keyof typeof workingDayHour],
-                  maxDate,
-                  false,
-                  true
-                );
+          const inOt = inPenalty?.penaltyTimeNumber && inPenalty?.penaltyTimeNumber > 0 ? {penaltyTimeNumber:0,penaltyTimeText:'00:00'}: calculateAttendance(
+            workingDayHour[dayNameIn as keyof typeof workingDayHour],
+            minDate,
+            true,
+            true
+          );
+          const outOt = outPenalty?.penaltyTimeNumber && outPenalty?.penaltyTimeNumber >0 ? {penaltyTimeNumber:0,penaltyTimeText:'00:00'} : calculateAttendance(
+            workingDayHour[dayNameOut as keyof typeof workingDayHour],
+            maxDate,
+            false,
+            true
+          );
           inPenalty?.penaltyTimeNumber &&
             inPenalty?.penaltyTimeText &&
             inPenalty?.penaltyTimeNumber > 0 &&
@@ -282,8 +236,8 @@ const AttendaceList = (
 
            */
 
-          Details= (
-            <div className=" px-4 py-2">
+          body.push(
+            <TableCell key={index} className="whitespace-nowrap">
               <span className="text-blue-600">
                 In - {minDate.getHours()}
                 {":"}
@@ -322,7 +276,7 @@ const AttendaceList = (
                     <br />
                   </>
                 )}
-              <br />
+                <br />
               <span className="text-blue-600 ">
                 Out - {maxDate.getHours()}
                 {":"}
@@ -359,58 +313,68 @@ const AttendaceList = (
                     </span>
                   </>
                 )}
-            </div>
+            </TableCell>
+          );
+        } else {
+          body.push(
+            <TableCell key={index} className="text-red-800 whitespace-nowrap">
+              This Can not be reached{" "}
+            </TableCell>
           );
         }
-      }
+      } 
+      
     });
-    if (!foundMonthYear) {
-      if (
-        !(
-          workingDayHour &&
-          (workingDayHour[dayNameIn as keyof typeof workingDayHour] ||
-            workingDayHour[dayNameOut as keyof typeof workingDayHour])
-        )
-      ) {
-        Details = (<NotWorkingDay  />);
-      } else {
-        let absentTime = 0;
+    if(!foundMonthYear)
+    {
+      
         if (
-          workingDayHour[dayNameIn as keyof typeof workingDayHour] !==
-            undefined &&
-          workingDayHour[dayNameOut as keyof typeof workingDayHour] !==
-            undefined
+          !(
+            workingDayHour &&
+            (workingDayHour[dayNameIn as keyof typeof workingDayHour] ||
+              workingDayHour[dayNameOut as keyof typeof workingDayHour])
+          )
         ) {
-          // @ts-ignore
-          absentTime = compareTimes(workingDayHour[dayNameIn as keyof typeof workingDayHour],
-            workingDayHour[dayNameOut as keyof typeof workingDayHour]
+          body.push(<NotWorkingDay index={index} />);
+        } else {
+          let absentTime = 0;
+          if (
+            workingDayHour[dayNameIn as keyof typeof workingDayHour] !==
+              undefined &&
+            workingDayHour[dayNameOut as keyof typeof workingDayHour] !==
+              undefined
+          ) {
+            // @ts-ignore
+            absentTime = compareTimes(workingDayHour[dayNameIn as keyof typeof workingDayHour],
+              workingDayHour[dayNameOut as keyof typeof workingDayHour]
+            );
+            absentTime = absentTime > 8 ? 8 : absentTime;
+            totalPenality.absent += absentTime;
+          }
+          body.push(
+            <TableCell key={index} className="text-red-800 whitespace-nowrap">
+              <span>Absent </span> <br />
+              <span className="text-red-700">
+                {" "}
+                -
+                {PenaltyMoneyCalculator(
+                  activeContract.grossSalary.$numberDecimal,
+                  absentTime
+                )}{" "}
+                Birr
+              </span>{" "}
+            </TableCell>
           );
-          absentTime = absentTime > 8 ? 8 : absentTime;
-          totalPenality.absent += absentTime;
         }
-        Details = (
-          <div className=" px-4 py-2 text-red-700">
-            <span>Absent </span> <br />
-            <span className="text-red-700">
-              {" "}
-              -
-              {PenaltyMoneyCalculator(
-                activeContract.grossSalary.$numberDecimal,
-                absentTime
-              )}{" "}
-              Birr
-            </span>{" "}
-          </div>
-        );
-      }
+      
     }
-    AllDetails.push(<Ad date={CopyDate} index={index}>{Details}</Ad>)
+
     loopDate.setDate(loopDate.getDate() + 1);
     index = index + 1;
 
     if (!(loopDate <= date?.to)) {
-      Details = (
-        <div className="text-black px-4 py-2">
+      body.push(
+        <TableCell key={index} className="text-black whitespace-nowrap">
           {totalPenality?.absent > 0 && (
             <>
               <span className="text-red-700">
@@ -481,15 +445,16 @@ const AttendaceList = (
               <br />
             </>
           )}
-        </div>
+
+
+          
+        </TableCell>
       );
-
-      AllDetails.push(<Ad date={'total'} index={index}>{Details}</Ad>)
     }
-
   }
-  return AllDetails;
+  return body;
 };
+
 
 //   const fromDate = new Date('2019-01-01');
 // const toDate = new Date('2019-01-31');

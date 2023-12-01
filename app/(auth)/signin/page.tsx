@@ -63,13 +63,8 @@ const Login = () => {
     <>
       <div className="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <Image
-            className="mx-auto h-12 w-auto"
-            src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
-            alt="Workflow"
-            width={48}
-            height={48}
-          />
+          <h1
+            className="mx-auto text-center font-extrabold text-[50px] text-red-700"> S</h1>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign in to your account
           </h2>
