@@ -101,6 +101,7 @@ const UploadBulkFilePage = async ({
 
 
   if(!preparedEmployeeData) return new Error("Couldn't get data from the sheet(s)");
+  console.log(preparedEmployeeData)
   // TODO: parse only data's with all the required fields are filled!
   
  
