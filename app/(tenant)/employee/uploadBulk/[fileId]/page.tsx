@@ -111,7 +111,8 @@ const UploadBulkFilePage = async ({
     <>
     <h1>View Submit Employees data</h1>
     <Suspense fallback={<div>Loading...</div>}> 
-    <DataTableBulkEmployee searchKey="fullName" columns={columns} data={preparedEmployeeData}  preparedCompanyData={preparedCompanyData} preparedEmployeeData={preparedEmployeeData} />
+    <h1>Hello</h1>
+    {/* <DataTableBulkEmployee searchKey="fullName" columns={columns} data={preparedEmployeeData}  preparedCompanyData={preparedCompanyData} preparedEmployeeData={preparedEmployeeData} /> */}
     </Suspense>
     </>
   )
