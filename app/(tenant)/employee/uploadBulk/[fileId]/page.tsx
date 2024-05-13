@@ -49,25 +49,30 @@ const UploadBulkFilePage = async ({
    let overtimeData:overtimeTypeBulk[];
    let workingHourData:workingHourTypeBulk[];
    let companyAllowancesData:companyAllowanceTypeBulk[];
+
   try {
    await dbConnect();
     file = await UploadedFile.findById(params.fileId);
   } catch (error) {
-    console.log(error);
+    console.log({'Error Happed 01':error});
     return new Error("something went wrong inSide File");
   }
-  if (!file) return new Error("File Not Found");
+  if (!file) {
+    console.log("ErOrRe :             File Not Found          _________________ ")
+    return new Error("File Not Found");
+  }
 
   try {
     axiosResponse = await axios(file.url, { responseType: "arraybuffer" });
   } catch (error) {
-    console.log(error);
+    console.log({'Error Happed 02':error});
     return new Error("Axios error ");
   }
   try {
     excelFile = xlsx.read(axiosResponse.data);
   } catch (error) {
-    console.log(error);
+    console.log({'Error Happed 03':error});
+    
     return new Error("Excel File not found");
   }
   if (!excelFile) {
@@ -93,15 +98,13 @@ const UploadBulkFilePage = async ({
     return new Error("Couldn't get data from the sheet(s)")
     // console.log(error);
   }
+  // console.log(workingHourData)
 
   const  preparedEmployeeData:employeeData[]|undefined = PreparedData({personalData,contractData,allowanceData,overtimeData,workingHourData});
   const  preparedCompanyData:companyAllowanceTypeBulk[]|[] = CompanyAllowancePrepare(companyAllowancesData);
 
- 
-
-
   if(!preparedEmployeeData) return new Error("Couldn't get data from the sheet(s)");
-  console.log({'Prepared_____':preparedEmployeeData})
+  
   // TODO: parse only data's with all the required fields are filled!
   
  
@@ -111,8 +114,7 @@ const UploadBulkFilePage = async ({
     <>
     <h1>View Submit Employees data</h1>
     <Suspense fallback={<div>Loading...</div>}> 
-    <h1>Hello</h1>
-    {/* <DataTableBulkEmployee searchKey="fullName" columns={columns} data={preparedEmployeeData}  preparedCompanyData={preparedCompanyData} preparedEmployeeData={preparedEmployeeData} /> */}
+    <DataTableBulkEmployee searchKey="fullName" columns={columns} data={preparedEmployeeData}  preparedCompanyData={preparedCompanyData} preparedEmployeeData={preparedEmployeeData} />
     </Suspense>
     </>
   )

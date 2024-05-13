@@ -126,6 +126,7 @@ export const PreparedData = ({
       ArrayOfEmployeeContractData.push(prepareContract);
   });
 
+
   let ArrayOfEmployeeAllowanceData: allowancePrepare[] = [];
 
   allowanceData.forEach((allowance) => {
@@ -141,6 +142,7 @@ export const PreparedData = ({
       ArrayOfEmployeeAllowanceData.push(prepareAllowance);
   });
 
+
   let ArrayOfEmployeeOvertimeData: overtimePrepare[] = [];
   overtimeData.forEach((overtime) => {
     let prepareOvertime: overtimePrepare = {
@@ -155,6 +157,9 @@ export const PreparedData = ({
     !Object.values(prepareOvertime).includes(undefined) &&
       ArrayOfEmployeeOvertimeData.push(prepareOvertime);
   });
+
+  console.log(overtimeData)
+
   let ArrayOfEmployeeWorkingHourData: workingHourPrepare[] = [];
   workingHourData.forEach((workingHour) => {
     let prepareWorkingHour: workingHourPrepare = {
